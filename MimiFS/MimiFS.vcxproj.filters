@@ -78,6 +78,9 @@
     <ClInclude Include="MiniFileWriter.h">
       <Filter>头文件\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="标头wdef.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
