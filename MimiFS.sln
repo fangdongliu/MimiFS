@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2037
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MimiFS", "MimiFS\MimiFS.vcxproj", "{71066A53-2EE0-46B6-9CE8-164613FFBA96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Debug|x64.ActiveCfg = Debug|x64
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Debug|x64.Build.0 = Debug|x64
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Debug|x86.ActiveCfg = Debug|Win32
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Debug|x86.Build.0 = Debug|Win32
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Release|x64.ActiveCfg = Release|x64
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Release|x64.Build.0 = Release|x64
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Release|x86.ActiveCfg = Release|Win32
+		{71066A53-2EE0-46B6-9CE8-164613FFBA96}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6AFD2C3A-3059-4478-B008-F1C52CEF9FAA}
+	EndGlobalSection
+EndGlobal
