@@ -81,6 +81,9 @@
     <ClInclude Include="标5头.h">
       <Filter>头文件\Handler</Filter>
     </ClInclude>
+    <ClInclude Include="标头wdef.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
