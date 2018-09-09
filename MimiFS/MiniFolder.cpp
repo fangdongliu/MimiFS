@@ -148,23 +148,26 @@ void MiniFolder::updateDir() {
 
 }
 
-void MiniFolder::deleteForever() {
+int MiniFolder::deleteForever() {
 
 	if (!loaded) {
 		load();
 	}
+	
+	int count = 0;
 
 	for (auto i : childs) {
 
 		if (i.second) {
 			i.second->deleteForever();
 			delete i.second;
+			count++;
 		}
 
 	}
 
 	op.releaseBlock(fileHead.blockId);
-
+	return count;
 }
 
 
@@ -222,7 +225,7 @@ bool MiniFolder::moveFrom(MiniFolder*other, std::string&filename) {
 		auto& from = other->atChild(filename);
 		auto& to = childs[filename];
 		if (to) {
-			cout << "目标文件已存在，是否覆盖?[Y/N]";
+			cout << "目标文件已存在，是否覆盖?[Y/N]:";
 			string str;
 			getline(cin, str);
 			if (!(str.length() == 1 && str[0] == 'y' || str[0] == 'Y')) {

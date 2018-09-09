@@ -170,7 +170,7 @@ public:
 
 	bool isFolder() { return fileHead.type == FS_FILETYPE_FOLDER; }
 	void moveTo(MiniFolder*);
-	virtual void deleteForever();
+	virtual int deleteForever();
 
 
 protected:

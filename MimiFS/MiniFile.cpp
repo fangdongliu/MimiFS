@@ -15,10 +15,10 @@ MiniFile::~MiniFile()
 {
 }
 
-void MiniFile::deleteForever() {
+int MiniFile::deleteForever() {
 
 	op.releaseBlock(fileHead.blockId);
-
+	return 0;
 }
 
 

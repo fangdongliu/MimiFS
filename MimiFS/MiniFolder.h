@@ -16,7 +16,7 @@ public:
 
 	std::string getAbsolutePath();
 
-	void deleteForever()override;
+	int deleteForever()override;
 	void findMatchFiles(std::string&pattern,std::vector<MiniFile*>&out);
 
 	bool moveFrom(MiniFolder*other,std::string&filename);

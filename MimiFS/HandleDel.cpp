@@ -47,7 +47,7 @@ void HandleDel::onHandleCommand(Lexer&param) {
 							count += files.size();
 							for (auto i : files) {
 								string n = i->getFilename();
-								i->deleteForever();
+								count+=i->deleteForever();
 								delete i;
 								folder->atChild(n) = nullptr;
 							}
@@ -59,7 +59,7 @@ void HandleDel::onHandleCommand(Lexer&param) {
 						try {
 							auto& b = folder->atChild(filename);
 							if (b) {
-								b->deleteForever();
+								count += b->deleteForever();
 								delete b;
 								b = nullptr;
 								count++;
@@ -67,7 +67,7 @@ void HandleDel::onHandleCommand(Lexer&param) {
 							}
 						}
 						catch (exception&e) {
-							
+
 						}
 					}
 				}
