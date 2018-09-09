@@ -19,6 +19,8 @@ public:
 	void deleteForever()override;
 	void findMatchFiles(std::string&pattern,std::vector<MiniFile*>&out);
 
+	bool moveFrom(MiniFolder*other,std::string&filename);
+
 	MiniFile* createChildFile(std::string& filename);
 	MiniFolder* createChildFolder(std::string& filename);
 

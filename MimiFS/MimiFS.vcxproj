@@ -154,6 +154,7 @@
     <ClInclude Include="HandleDr.h" />
     <ClInclude Include="HandleMd.h" />
     <ClInclude Include="HandleMf.h" />
+    <ClInclude Include="HandleMv.h" />
     <ClInclude Include="HandleTree.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="MiniFile.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="HandleDr.cpp" />
     <ClCompile Include="HandleMd.cpp" />
     <ClCompile Include="HandleMf.cpp" />
+    <ClCompile Include="HandleMv.cpp" />
     <ClCompile Include="HandleTree.cpp" />
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="MimiFS.cpp" />

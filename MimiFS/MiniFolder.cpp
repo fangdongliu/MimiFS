@@ -212,3 +212,35 @@ void MiniFolder::printTree(int depth) {
 	}
 	std::cout<<str << "╙\n";
 }
+
+bool MiniFolder::moveFrom(MiniFolder*other, std::string&filename) {
+	
+	using namespace std;
+
+	try {
+
+		auto& from = other->atChild(filename);
+		auto& to = childs[filename];
+		if (to) {
+			cout << "目标文件已存在，是否覆盖?[Y/N]";
+			string str;
+			getline(cin, str);
+			if (!(str.length() == 1 && str[0] == 'y' || str[0] == 'Y')) {
+				return false;
+			}
+			else {
+				to->deleteForever();
+			}
+		}
+		{
+			to = from;
+			from = nullptr;
+			updateDir();
+			other->updateDir();
+			return true;
+		}
+	}
+	catch (exception&e) {
+		return false;
+	}
+}

@@ -23,6 +23,7 @@ MiniFileWriter::~MiniFileWriter()
 		MiniFile::op.seekBlock(curBlock);
 		MiniFile::op.write(head);
 	}
+
 }
 
 int MiniFileWriter::getBlockMaxWriteSize() {
