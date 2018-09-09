@@ -37,6 +37,7 @@ Lexer::Token Lexer::nextToken() {
 			}
 			current++;
 		}
+		current++;
 		return token=Token::RealString;
 	}
 
@@ -56,6 +57,7 @@ Lexer::Token Lexer::nextToken() {
 			}
 			current++;
 		}
+		current++;
 		return token=Token::RealString;
 	}
 	case '-': {
