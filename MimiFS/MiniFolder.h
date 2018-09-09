@@ -17,7 +17,6 @@ public:
 	std::string getAbsolutePath();
 
 	void deleteForever()override;
-
 	void findMatchFiles(std::string&pattern,std::vector<MiniFile*>&out);
 
 	MiniFile* createChildFile(std::string& filename);

@@ -51,7 +51,7 @@ protected:
 
 		void close();
 		void open(std::string& filename);
-		
+
 		void seekBlock(int blockId);
 		void reseekCurBlock();
 
@@ -90,9 +90,7 @@ protected:
 			read(t.type);
 			read(t.createTime);
 			read(t.filename);
-			if (t.type == 0) {
-				read(t.size);
-			}
+			read(t.size);
 		}
 
 		template<>
@@ -101,9 +99,7 @@ protected:
 			write(t.type);
 			write(t.createTime);
 			write(t.filename);
-			if (t.type == 0) {
-				write(t.size);
-			}
+			write(t.size);
 		}
 
 		template<>
@@ -112,9 +108,7 @@ protected:
 			write(t.type);
 			write(t.createTime);
 			write(t.filename);
-			if (t.type == 0) {
-				write(t.size);
-			}
+			write(t.size);
 		}
 
 		template<>
