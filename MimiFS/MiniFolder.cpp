@@ -188,3 +188,27 @@ void MiniFolder::load() {
 	} while (blockHead.nextBlockId);
 
 }
+
+void MiniFolder::printTree(int depth) {
+
+	if (!loaded)
+		load();
+
+	std::string str;
+	for (int i = 0; i < depth; i++) {
+		str += "¨U  ";
+	}
+	std::string str2= str + "¨d¨T";
+
+	for (auto i : childs) {
+
+		if (i.second) {
+			std::cout << str2 + ' ' + i.first << std::endl;
+			if (i.second->isFolder()) {
+				((MiniFolder*)i.second)->printTree(depth + 1);
+			}
+		}
+
+	}
+	std::cout<<str << "¨]\n";
+}

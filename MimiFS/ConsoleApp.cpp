@@ -36,18 +36,16 @@ void ConsoleApp::handleCommand(std::string&command) {
 
 	Lexer lexer(command);
 
-	switch (lexer.nextToken())
-	{
-	case Lexer::Token::None:
+	if (lexer.nextTokenMatchEnd()) {
 		printPrefix();
 		return;
-	case Lexer::Token::String:
-		break;
-	default:
+	}
+	else if(lexer.token!=Lexer::Token::String){
 		cout << "wrong command" << std::endl;
 		goto handleCommandEnd;
 	}
 
+	
 	if (lexer.str == "mount") {
 		string no = "";
 		Lexer param2(no);
@@ -111,7 +109,7 @@ void ConsoleApp::showFSInfo(Lexer&param) {
 	
 	using namespace std;
 
-	if (param.nextToken() != Lexer::Token::None) {
+	if (!param.nextTokenMatchEnd()) {
 		std::cout << "info need no param";
 		return;
 	}
@@ -126,13 +124,13 @@ void ConsoleApp::showHelp(Lexer& param) {
 
 	using namespace std;
 
-	if (param.nextToken() == Lexer::Token::None) {
+	if (param.nextTokenMatchEnd()) {
 		for (auto i : helpList) {
 			cout << i.first << " : ";
 			cout << i.second.title << endl;
 		}
 	}
-	else if (param.token == Lexer::Token::String) {
+	else if (param.matchString()) {
 		try
 		{
 			auto i = helpList.at(param.str);
@@ -152,7 +150,7 @@ void ConsoleApp::showHelp(Lexer& param) {
 
 void ConsoleApp::closeMiniFS(Lexer&param) {
 
-	if (param.nextToken() != Lexer::Token::None) {
+	if (!param.nextTokenMatchEnd()) {
 		std::cout << "close need no param";
 		return;
 	}
@@ -173,40 +171,28 @@ void ConsoleApp::formatMiniFS(Lexer& param) {
 	head.fileSize = 1 << 30;
 	head.blockSize = 1 << 10;
 
-	switch (param.nextToken())
-	{
-	case Lexer::Token::None:
-		break;
-	case Lexer::Token::Num:
+	if (param.nextTokenMatchNum()) {
 		head.fileSize = param.num;
 
-		switch (param.nextToken())
-		{
-		case Lexer::Token::None:
-			break;
-		case Lexer::Token::Num:
+		if (param.nextTokenMatchNum()) {
 			head.blockSize = param.num;
-			break;
-		default:
+		}
+		else if (!param.matchEnd()) {
 			goto fmtMiniFSERR;
 		}
-
-		break;
-	default:
+	}
+	else if (!param.matchEnd()) {
 		goto fmtMiniFSERR;
 	}
 
 	{
-
 		head.firstEmptyBlockId = 3;
 		head.emptyBlockCount = head.fileSize / head.blockSize - 2;
 
 		auto &f = MiniFile::op;
 
 		f.superHead = head;
-
 		f.seekBlock(0);
-
 		f.write(head);
 
 		BlockHead blockHead;
@@ -214,20 +200,15 @@ void ConsoleApp::formatMiniFS(Lexer& param) {
 		blockHead.size = 0;
 
 		f.seekBlock(1);
-
 		f.write(blockHead);
 
 		f.seekBlock(2);
-
 		f.write(blockHead);
 
 		for (int i = 3; i < head.emptyBlockCount + 3; i++) {
-
 			f.seekBlock(i);
-
 			blockHead.nextBlockId = i + 1;
 			f.write(blockHead);
-
 		}
 
 		f.seekBlock(head.emptyBlockCount + 3);
@@ -250,15 +231,10 @@ void ConsoleApp::mountMiniFS(Lexer& param) {
 
 	std::string filename;
 
-	switch (param.nextToken())
-	{
-	case Lexer::Token::RealString:
-	case Lexer::Token::String:
+	if (param.nextTokenMatchString()) {
 		filename = param.str;
-		break;
-	default:
-		goto mountMiniFSERR;
 	}
+	else goto mountMiniFSERR;
 
 	{
 		if (filename.length() < 3) {
@@ -291,15 +267,10 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 
 	std::string filename;
 
-	switch (param.nextToken())
-	{
-	case Lexer::Token::RealString:
-	case Lexer::Token::String:
+	if (param.nextTokenMatchString()) {
 		filename = param.str;
-		break;
-	default:
-		goto createMiniFSERR;
 	}
+	else goto createMiniFSERR;
 
 	{
 		if (filename.length() < 3) {
@@ -318,26 +289,17 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 		head.fileSize = 1 << 30;
 		head.blockSize = 1 << 10;
 
-		switch (param.nextToken())
-		{
-		case Lexer::Token::None:
-			break;
-		case Lexer::Token::Num:
+		if (param.nextTokenMatchNum()) {
 			head.fileSize = param.num;
 
-			switch (param.nextToken())
-			{
-			case Lexer::Token::None:
-				break;
-			case Lexer::Token::Num:
+			if (param.nextTokenMatchNum()) {
 				head.blockSize = param.num;
-				break;
-			default:
+			}
+			else if (!param.matchEnd()) {
 				goto createMiniFSERR;
 			}
-
-			break;
-		default:
+		}
+		else if (!param.matchEnd()) {
 			goto createMiniFSERR;
 		}
 

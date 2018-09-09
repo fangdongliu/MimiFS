@@ -18,6 +18,16 @@ public:
 
 	Token nextToken();
 
+
+	bool nextTokenMatchString();
+	bool nextTokenMatchEnd();
+	bool nextTokenMatchCommand();
+	bool nextTokenMatchNum();
+	bool matchNum();
+	bool matchString();
+	bool matchCommand();
+	bool matchEnd();
+
 	long num;
 	std::string str;
 

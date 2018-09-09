@@ -22,6 +22,8 @@ public:
 	MiniFile* createChildFile(std::string& filename);
 	MiniFolder* createChildFolder(std::string& filename);
 
+	void printTree(int depth);
+
 	void clear();
 
 	void updateDir();

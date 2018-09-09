@@ -9,32 +9,23 @@ void HandleCd::onHandleCommand(Lexer&param) {
 
 	string pathname;
 
-	switch (param.nextToken())
-	{
-	case Lexer::Token::RealString:
-	case Lexer::Token::String:
+	if (param.nextTokenMatchString()&&param.nextTokenMatchEnd()) {
 		pathname = param.str;
-		if (param.nextToken() == Lexer::Token::None) {
-			break;
-		}
-	default:
+	}
+	else {
 		cout << "cd \"path\"\n";
 		return;
 	}
 
 	vector<string>out;
-
 	Helper::cutPathFromString(pathname, out);
 
 	auto f = ConsoleApp::getInstance()->getFolderByPath(out);
 
-	if (f) {
+	if (f) 
 		ConsoleApp::getInstance()->current = f;
-	}
-	else {
+	else 
 		cout << "目标目录不存在\n";
-	}
-
-
+	
 
 }

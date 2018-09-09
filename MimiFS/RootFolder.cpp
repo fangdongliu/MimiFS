@@ -6,6 +6,7 @@ RootFolder::RootFolder()
 {
 	fileHead.blockId = 1;
 	parent = 0;
+	fileHead.filename = "root";
 }
 
 

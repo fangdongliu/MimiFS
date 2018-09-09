@@ -87,6 +87,9 @@
     <ClInclude Include="HandleMf.h">
       <Filter>头文件\Handler</Filter>
     </ClInclude>
+    <ClInclude Include="HandleTree.h">
+      <Filter>头文件\Handler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -138,6 +141,9 @@
       <Filter>源文件\Helper</Filter>
     </ClCompile>
     <ClCompile Include="HandleMf.cpp">
+      <Filter>源文件\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleTree.cpp">
       <Filter>源文件\Handler</Filter>
     </ClCompile>
   </ItemGroup>

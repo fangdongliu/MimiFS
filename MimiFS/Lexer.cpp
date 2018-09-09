@@ -83,3 +83,33 @@ Lexer::Token Lexer::nextToken() {
 	}
 
 }
+
+bool Lexer::nextTokenMatchString() {
+	nextToken();
+	return token == Token::String || token == Token::RealString;
+}
+bool Lexer::nextTokenMatchEnd() {
+	nextToken();
+	return token == Token::None;
+}
+bool Lexer::nextTokenMatchCommand() {
+	nextToken();
+	return token == Token::Command;
+}
+bool Lexer::nextTokenMatchNum() {
+	nextToken();
+	return token == Token::Num;
+}
+bool Lexer::matchString() {
+	return token == Token::String || token == Token::RealString;
+}
+bool Lexer::matchCommand() {
+	return token == Token::Command;
+}
+bool Lexer::matchEnd() {
+	return token == Token::None;
+}
+
+bool Lexer::matchNum(){
+	return token == Token::Num;
+}

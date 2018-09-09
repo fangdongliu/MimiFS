@@ -81,6 +81,6 @@ void HandleDel::onHandleCommand(Lexer&param) {
 	}
 
 delError:
-	cout << "del [-b] \"filename\" ... \n";
+	cout << "del \"filename\" ... \n";
 	return;
 }
