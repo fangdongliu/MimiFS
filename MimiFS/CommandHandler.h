@@ -2,7 +2,7 @@
 class CommandHandler
 {
 public:
-	virtual void onHandleCommand(std::istream&param)=0;
+	virtual void onHandleCommand(Lexer&param)=0;
 
 };
 

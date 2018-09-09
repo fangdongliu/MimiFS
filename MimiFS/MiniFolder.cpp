@@ -33,6 +33,18 @@ void MiniFolder::show() {
 
 }
 
+void MiniFolder::findMatchFiles(std::string&pattern,std::vector<MiniFile*>&out) {
+
+	for (auto i : childs) {
+		if (i.second) {
+			if (Helper::blurMatch(pattern, i.first)) {
+				out.push_back(i.second);
+			}
+		}
+	}
+
+}
+
 void MiniFolder::clear() {
 
 	for (auto i : childs) {

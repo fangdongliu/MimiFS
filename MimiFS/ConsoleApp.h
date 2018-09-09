@@ -10,20 +10,6 @@ class ConsoleApp SINGLE_INSTANCE
 	ConsoleApp(const ConsoleApp& src) {}
 	ConsoleApp &operator=(const ConsoleApp& src) {};
 
-	class Garbo   
-	{
-	public:
-		~Garbo()
-		{
-			if (ConsoleApp::instance)
-			{
-				delete ConsoleApp::instance;
-				ConsoleApp::instance = NULL;
-			}
-		}
-	};
-	static Garbo garbo;
-
 public:
 	static ConsoleApp * getInstance() {
 		if (!instance) {
@@ -36,12 +22,12 @@ public:
 
 	void addHandler(CommandHandler*);
 
-	void showHelp(std::istream&);
-	void createMiniFS(std::istream& param);
-	void mountMiniFS(std::istream& param);
+	void showHelp(Lexer&);
+	void createMiniFS(Lexer&);
+	void mountMiniFS(Lexer&);
 
-	void closeMiniFS();
-	void formatMiniFS(std::istream&);
+	void closeMiniFS(Lexer&);
+	void formatMiniFS(Lexer&);
 
 	void printPrefix();
 

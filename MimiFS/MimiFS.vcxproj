@@ -153,6 +153,7 @@
     <ClInclude Include="HandleDel.h" />
     <ClInclude Include="HandleDr.h" />
     <ClInclude Include="HandleMd.h" />
+    <ClInclude Include="Lexer.h" />
     <ClInclude Include="MiniFile.h" />
     <ClInclude Include="MiniFileReader.h" />
     <ClInclude Include="MiniFileWriter.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="HandleDel.cpp" />
     <ClCompile Include="HandleDr.cpp" />
     <ClCompile Include="HandleMd.cpp" />
+    <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="MimiFS.cpp" />
     <ClCompile Include="MiniFile.cpp" />
     <ClCompile Include="MiniFileReader.cpp" />

@@ -84,6 +84,9 @@
     <ClInclude Include="标头wdef.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Lexer.h">
+      <Filter>头文件\Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -129,6 +132,9 @@
       <Filter>源文件\Helper</Filter>
     </ClCompile>
     <ClCompile Include="MiniFileWriter.cpp">
+      <Filter>源文件\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Lexer.cpp">
       <Filter>源文件\Helper</Filter>
     </ClCompile>
   </ItemGroup>

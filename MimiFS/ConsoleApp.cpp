@@ -3,8 +3,6 @@
 #include "CommandHandler.h"
 ConsoleApp* ConsoleApp::instance = nullptr;
 
-ConsoleApp::Garbo ConsoleApp::garbo;
-
 ConsoleApp::ConsoleApp() {
 
 	helpList["close"] = { "关闭MiniFS系统","" };
@@ -19,7 +17,7 @@ void ConsoleApp::printPrefix() {
 
 	if (MiniFile::op.ready()) {
 		if (current == &trashBin) {
-			std::cout << "trashBin:// > ";
+			std::cout << "trashBin:/ > ";
 		}
 		else {
 			std::cout << current->getAbsolutePath() + " > ";
@@ -35,44 +33,43 @@ void ConsoleApp::handleCommand(std::string&command) {
 
 	using namespace std;
 
-	stringbuf s(command);
-	istream in(&s);
+	Lexer lexer(command);
 
-	string firstWord;
-
-
-	in >> firstWord;
-
-	if (in.fail()) {
+	switch (lexer.nextToken())
+	{
+	case Lexer::Token::None:
 		printPrefix();
 		return;
+	case Lexer::Token::String:
+		break;
+	default:
+		cout << "wrong command" << std::endl;
+		goto handleCommandEnd;
 	}
 
-
-
-	if (firstWord == "mount") {
-		mountMiniFS(in);
+	if (lexer.str == "mount") {
+		mountMiniFS(lexer);
 	}
-	else if (firstWord == "create") {
-		createMiniFS(in);
+	else if (lexer.str == "create") {
+		createMiniFS(lexer);
 	}
-	else if (firstWord == "help") {
-		showHelp(in);
+	else if (lexer.str == "help") {
+		showHelp(lexer);
 	}
 	else if (MiniFile::op.ready()) {
-		if (firstWord == "fmt") {
-			formatMiniFS(in);
+		if (lexer.str == "fmt") {
+			formatMiniFS(lexer);
 
 		}
-		else if (firstWord == "close") {
-			closeMiniFS();
+		else if (lexer.str == "close") {
+			closeMiniFS(lexer);
 		}
 		else{
 			CommandHandler *dealer = nullptr;
 
 			try
 			{
-				dealer = handler.at(firstWord);
+				dealer = handler.at(lexer.str);
 			}
 			catch (const std::exception& e)
 			{
@@ -82,7 +79,7 @@ void ConsoleApp::handleCommand(std::string&command) {
 
 			try
 			{
-				dealer->onHandleCommand(in);
+				dealer->onHandleCommand(lexer);
 			}
 			catch (const std::exception& e)
 			{
@@ -99,23 +96,20 @@ handleCommandEnd:
 
 }
 
-void ConsoleApp::showHelp(std::istream& param) {
+void ConsoleApp::showHelp(Lexer& param) {
 
 	using namespace std;
 
-	std::string cmd;
-	param >> cmd;
-
-	if (param.fail()) {
+	if (param.nextToken() == Lexer::Token::None) {
 		for (auto i : helpList) {
 			cout << i.first << " : ";
 			cout << i.second.title << endl;
 		}
 	}
-	else {
+	else if (param.nextToken() == Lexer::Token::String) {
 		try
 		{
-			auto i = helpList.at(cmd);
+			auto i = helpList.at(param.str);
 			cout << i.title << endl;
 			cout << i.detail << endl;
 		}
@@ -124,9 +118,18 @@ void ConsoleApp::showHelp(std::istream& param) {
 			cout << "目标命令不存在" << endl;
 		}
 	}
+	else {
+		cout << "help [\"command\"]\n";
+	}
+
 }
 
-void ConsoleApp::closeMiniFS() {
+void ConsoleApp::closeMiniFS(Lexer&param) {
+
+	if (param.nextToken() != Lexer::Token::None) {
+		std::cout << "close need no param";
+		return;
+	}
 
 	MiniFile::op.close();
 	trashBin.clear();
@@ -136,22 +139,38 @@ void ConsoleApp::closeMiniFS() {
 
 }
 
-void ConsoleApp::formatMiniFS(std::istream& param) {
+void ConsoleApp::formatMiniFS(Lexer& param) {
+
+	using namespace std;
 
 	SuperHead head;
 	head.fileSize = 1 << 30;
 	head.blockSize = 1 << 10;
 
-	if (!param.eof() && param.fail()) {
-		goto fmtMiniFSERR;
-	}
-	param >> head.fileSize;
-
-	if (!param.eof() && param.fail()) {
-		goto fmtMiniFSERR;
-	}
+	switch (param.nextToken())
 	{
-		param >> head.blockSize;
+	case Lexer::Token::None:
+		break;
+	case Lexer::Token::Num:
+		head.fileSize = param.num;
+
+		switch (param.nextToken())
+		{
+		case Lexer::Token::None:
+			break;
+		case Lexer::Token::Num:
+			head.blockSize = param.num;
+			break;
+		default:
+			goto fmtMiniFSERR;
+		}
+
+		break;
+	default:
+		goto fmtMiniFSERR;
+	}
+
+	{
 
 		head.firstEmptyBlockId = 3;
 		head.emptyBlockCount = head.fileSize / head.blockSize - 2;
@@ -201,14 +220,19 @@ fmtMiniFSERR:
 	std::cout << "fmt [filesize] [blocksize]" << std::endl;
 }
 
-void ConsoleApp::mountMiniFS(std::istream& param) {
+void ConsoleApp::mountMiniFS(Lexer& param) {
 
 	std::string filename;
 
-	param >> filename;
-
-	if (param.fail())
+	switch (param.nextToken())
+	{
+	case Lexer::Token::RealString:
+	case Lexer::Token::String:
+		filename = param.str;
+		break;
+	default:
 		goto mountMiniFSERR;
+	}
 
 	{
 		MiniFile::op.open(filename);
@@ -227,17 +251,23 @@ void ConsoleApp::mountMiniFS(std::istream& param) {
 	}
 
 mountMiniFSERR:
-	std::cout << "mount \"filename\" [filesize] [blocksize]" << std::endl;
+	std::cout << "mount \"filename\"" << std::endl;
 }
 
-void ConsoleApp::createMiniFS(std::istream& param) {
+void ConsoleApp::createMiniFS(Lexer& param) {
 
 	std::string filename;
 
-	param >> filename;
-
-	if (param.fail())
+	switch (param.nextToken())
+	{
+	case Lexer::Token::RealString:
+	case Lexer::Token::String:
+		filename = param.str;
+		break;
+	default:
 		goto createMiniFSERR;
+	}
+
 	{
 		MyFileWriter writer(filename);
 		if (!writer.ready()) {
@@ -248,15 +278,26 @@ void ConsoleApp::createMiniFS(std::istream& param) {
 		head.fileSize = 1 << 30;
 		head.blockSize = 1 << 10;
 
-		param >> head.fileSize;
+		switch (param.nextToken())
+		{
+		case Lexer::Token::None:
+			break;
+		case Lexer::Token::Num:
+			head.fileSize = param.num;
 
-		if (!param.eof() && param.fail()) {
-			goto createMiniFSERR;
-		}
+			switch (param.nextToken())
+			{
+			case Lexer::Token::None:
+				break;
+			case Lexer::Token::Num:
+				head.blockSize = param.num;
+				break;
+			default:
+				goto createMiniFSERR;
+			}
 
-		param >> head.blockSize;
-
-		if (!param.eof() && param.fail()) {
+			break;
+		default:
 			goto createMiniFSERR;
 		}
 

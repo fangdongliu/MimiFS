@@ -165,6 +165,7 @@ public:
 	virtual void show() {}
 	int computeHeadSize() { return 18 + fileHead.filename.length(); }
 	void setFilename(std::string&filename) { fileHead.filename = filename; }
+	std::string getFilename() { return fileHead.filename; }
 	void setParent(MiniFolder*parent) { this->parent = parent; }
 	MiniFolder* getParent() { return parent; }
 

@@ -6,6 +6,6 @@ class HandleDel :
 public:
 	
 
-	void onHandleCommand(std::istream&param)override;
+	void onHandleCommand(Lexer&param)override;
 };
 
