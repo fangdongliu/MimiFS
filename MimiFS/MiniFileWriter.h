@@ -12,5 +12,6 @@ public:
 private:
 	int remain;
 	int curBlock;
+	MiniFile* file;
 };
 

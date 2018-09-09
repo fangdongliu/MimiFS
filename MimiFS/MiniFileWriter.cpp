@@ -6,6 +6,8 @@ MiniFileWriter::MiniFileWriter(MiniFile*file)
 	head.size = 0;
 	curBlock = 0;
 	head.nextBlockId = file->fileHead.blockId;
+	this->file = file;
+	file->fileHead.size = 0;
 }
 
 
@@ -50,6 +52,8 @@ int MiniFileWriter::writeToBlock(char*bytes, int bytecount) {
 	fwrite(bytes, 1, bytecount, MiniFile::op.file);
 	head.size = bytecount;
 
+	file->fileHead.size += bytecount;
+	
 	return bytecount;
 
 }

@@ -78,14 +78,14 @@
     <ClInclude Include="MiniFileWriter.h">
       <Filter>头文件\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="标5头.h">
-      <Filter>头文件\Handler</Filter>
-    </ClInclude>
     <ClInclude Include="标头wdef.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Lexer.h">
       <Filter>头文件\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleMf.h">
+      <Filter>头文件\Handler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="Lexer.cpp">
       <Filter>源文件\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleMf.cpp">
+      <Filter>源文件\Handler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

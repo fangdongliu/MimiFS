@@ -1,14 +1,14 @@
 #include "stdafx.h"
-#include "HandleMd.h"
+#include "HandleMf.h"
 
-REGISTER_HANDLER(HandleMd, "md", "新建一个文件夹", "md \"path\" \npath:相对路径或者绝对路径")
+REGISTER_HANDLER(HandleMf,"mf","创建一个新的文件","mf \"filename\"\nfilename:要创建文件的文件名")
 
-void HandleMd::onHandleCommand(Lexer&param) {
+void HandleMf::onHandleCommand(Lexer&param) {
 
 	using namespace std;
 
 	if (param.nextToken() == Lexer::Token::None) {
-		goto mdError;
+		goto mfError;
 	}
 	switch (param.token)
 	{
@@ -34,19 +34,18 @@ void HandleMd::onHandleCommand(Lexer&param) {
 				cout << "目标文件已存在\n";
 			}
 			else {
-				f->createChildFolder(filename);
+				f->createChildFile(filename);
 				f->updateDir();
 			}
 			return;
 		}
 	}
 	default:
-		goto mdError;
+		goto mfError;
 	}
 
-mdError:
-	cout << "md \"filename\" \n";
+mfError:
+	cout << "mf \"filename\"  \n";
 	return;
-
 
 }

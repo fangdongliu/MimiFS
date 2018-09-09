@@ -86,11 +86,14 @@ void ConsoleApp::handleCommand(std::string&command) {
 				cout << e.what() << std::endl;
 			}
 		}
+		if(MiniFile::op.ready())
+		MiniFile::op.updateHead();
 	}
 	else {
 		cout << "use \"mount\" to load a miniFS-space OR use \"create\" to create a miniFS-space" << std::endl;
 	}
 handleCommandEnd:
+
 	cout << std::endl;
 	printPrefix();
 

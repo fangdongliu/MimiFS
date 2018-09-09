@@ -42,13 +42,12 @@ protected:
 			currentBlockId = 0;
 		}
 
-
 		std::string filename;
 		SuperHead superHead;
 		int currentBlockId;
 		FILE * file;
 
-		
+		void updateHead();
 
 		void close();
 		void open(std::string& filename);
@@ -102,6 +101,9 @@ protected:
 			write(t.type);
 			write(t.createTime);
 			write(t.filename);
+			if (t.type == 0) {
+				write(t.size);
+			}
 		}
 
 		template<>
@@ -110,6 +112,9 @@ protected:
 			write(t.type);
 			write(t.createTime);
 			write(t.filename);
+			if (t.type == 0) {
+				write(t.size);
+			}
 		}
 
 		template<>

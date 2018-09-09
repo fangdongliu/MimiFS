@@ -22,6 +22,7 @@ void MiniFile::deleteForever() {
 }
 
 
+
 MiniFile* MiniFile::fromFileHead(MiniFileHead&head) {
 
 	if (head.type == FS_FILETYPE_FILE) {
@@ -36,6 +37,16 @@ MiniFile* MiniFile::fromFileHead(MiniFileHead&head) {
 		return folder;
 	}
 
+}
+
+void MiniFile::FileOperator::updateHead() {
+	seekBlock(0);
+	write(superHead);
+	flush();
+
+	using namespace std;
+	cout << superHead.emptyBlockCount<<endl;
+	cout << superHead.firstEmptyBlockId<<endl;
 }
 
 void MiniFile::FileOperator::reseekCurBlock() {
