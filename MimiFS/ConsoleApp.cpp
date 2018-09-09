@@ -10,6 +10,7 @@ ConsoleApp::ConsoleApp() {
 	helpList["mount"] = { "装载一个MiniFS系统","mount \"filename\"\nfilename : 要装载系统的文件名" };
 	helpList["help"] = { "显示帮助","help [\"cmd\"]\ncmd : 可选参数，若指定则查看其详细情况，否则列出所有命令" };
 	helpList["fmt"] = { "格式化MiniFS系统","fmt [fileSize] [blockSize]\nfileSize : 系统的文件大小\nblockSize : 系统每个块的大小" };
+	helpList["info"] = { "显示MiniFS系统状态信息","" };
 
 }
 
@@ -68,6 +69,9 @@ void ConsoleApp::handleCommand(std::string&command) {
 		else if (lexer.str == "close") {
 			closeMiniFS(lexer);
 		}
+		else if (lexer.str == "info") {
+			showFSInfo(lexer);
+		}
 		else {
 			CommandHandler *dealer = nullptr;
 
@@ -100,6 +104,21 @@ handleCommandEnd:
 
 	cout << std::endl;
 	printPrefix();
+
+}
+
+void ConsoleApp::showFSInfo(Lexer&param) {
+	
+	using namespace std;
+
+	if (param.nextToken() != Lexer::Token::None) {
+		std::cout << "info need no param";
+		return;
+	}
+
+	cout << "系统名 : " + MiniFile::op.filename<<endl;
+	cout << "空闲块个数" << MiniFile::op.superHead.emptyBlockCount << endl;
+	cout << "空闲块头部Id:" << MiniFile::op.superHead.firstEmptyBlockId << "(0/1/2则出错)" << endl;
 
 }
 
@@ -242,6 +261,13 @@ void ConsoleApp::mountMiniFS(Lexer& param) {
 	}
 
 	{
+		if (filename.length() < 3) {
+			filename += ".fs";
+		}
+		else if (!(filename[filename.length() - 1] == 's'&&filename[filename.length() - 2] == 'f'&&filename[filename.length() - 3] == '.')) {
+			filename += ".fs";
+		}
+
 		MiniFile::op.open(filename);
 
 		if (!MiniFile::op.ready()) {
@@ -276,6 +302,13 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 	}
 
 	{
+		if (filename.length() < 3) {
+			filename += ".fs";
+		}
+		else if (!(filename[filename.length() - 1] == 's'&&filename[filename.length() - 2] == 'f'&&filename[filename.length() - 3] == '.')) {
+			filename += ".fs";
+		}
+
 		MyFileWriter writer(filename);
 		if (!writer.ready()) {
 			return;

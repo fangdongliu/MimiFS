@@ -22,6 +22,7 @@ public:
 
 	void addHandler(CommandHandler*);
 
+	void showFSInfo(Lexer&);
 	void showHelp(Lexer&);
 	void createMiniFS(Lexer&);
 	void mountMiniFS(Lexer&);

@@ -46,7 +46,7 @@ void MiniFile::FileOperator::updateHead() {
 
 	using namespace std;
 	cout <<"空闲块个数"<< superHead.emptyBlockCount<<endl;
-	cout <<"空闲块头部Id:(0/1/2则出错)" <<superHead.firstEmptyBlockId<<endl;
+	cout <<"空闲块头部Id:" << superHead.firstEmptyBlockId<<"(0/1/2则出错)" <<endl;
 }
 
 void MiniFile::FileOperator::reseekCurBlock() {
