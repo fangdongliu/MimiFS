@@ -48,6 +48,10 @@ void ConsoleApp::handleCommand(std::string&command) {
 	}
 
 	if (lexer.str == "mount") {
+		string no = "";
+		Lexer param2(no);
+		if (MiniFile::op.ready())
+			closeMiniFS(param2);
 		mountMiniFS(lexer);
 	}
 	else if (lexer.str == "create") {
@@ -64,7 +68,7 @@ void ConsoleApp::handleCommand(std::string&command) {
 		else if (lexer.str == "close") {
 			closeMiniFS(lexer);
 		}
-		else{
+		else {
 			CommandHandler *dealer = nullptr;
 
 			try
@@ -86,8 +90,8 @@ void ConsoleApp::handleCommand(std::string&command) {
 				cout << e.what() << std::endl;
 			}
 		}
-		if(MiniFile::op.ready())
-		MiniFile::op.updateHead();
+		if (MiniFile::op.ready())
+			MiniFile::op.updateHead();
 	}
 	else {
 		cout << "use \"mount\" to load a miniFS-space OR use \"create\" to create a miniFS-space" << std::endl;
