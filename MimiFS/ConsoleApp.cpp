@@ -113,7 +113,7 @@ void ConsoleApp::showHelp(Lexer& param) {
 			cout << i.second.title << endl;
 		}
 	}
-	else if (param.nextToken() == Lexer::Token::String) {
+	else if (param.token == Lexer::Token::String) {
 		try
 		{
 			auto i = helpList.at(param.str);

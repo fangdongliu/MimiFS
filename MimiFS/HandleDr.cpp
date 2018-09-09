@@ -9,15 +9,15 @@ void HandleDr::onHandleCommand(Lexer&param) {
 	using namespace std;
 	
 	bool blur = false;
-	int count = 0;
-
+	param.str = "";
 	if (param.nextToken() == Lexer::Token::Command) {
 		if (param.str == "b") {
 			blur = true;
 		}
+		param.str = "";
 		param.nextToken();
 	}
-		
+	string pathname = param.str;
 	param.str = "";
 	switch (param.token)
 	{
@@ -28,32 +28,35 @@ void HandleDr::onHandleCommand(Lexer&param) {
 	case Lexer::Token::None: {
 
 		vector<string>out;
-		Helper::cutPathFromString(param.str, out);
+		Helper::cutPathFromString(pathname, out);
 		if (blur) {
 			string filename;
+			
 			if (out.size()) {
 				filename = out.back();
-			}
-			auto folder = ConsoleApp::getInstance()->getFolderByPath(out);
-			
-			if (folder) {
+				out.pop_back();
 
-				std::vector<MiniFile*>files;
-				folder->findMatchFiles(filename, files);
-				count += files.size();
-				for (auto i : files) {
-					if (i->isFolder()) {
-						cout << "/" << i->getFilename() << endl;
+				auto folder = ConsoleApp::getInstance()->getFolderByPath(out);
+
+				if (folder) {
+					std::vector<MiniFile*>files;
+					folder->findMatchFiles(filename, files);
+					cout << "匹配文件数：" << files.size() << endl;
+					for (auto i : files) {
+						if (i->isFolder()) {
+							cout << "/" << i->getFilename() << endl;
+						}
+						else {
+							cout << i->getFilename() << "     " << "byte" << endl;
+						}
 					}
-					else {
-						cout << i->getFilename() << "     "  << "byte" << endl;
-					}
+					
 				}
-
+				else {
+					cout << "目标目录不存在\n";
+				}
 			}
-			else {
-				cout << "目标目录不存在\n";
-			}
+			
 
 		}
 		else {
