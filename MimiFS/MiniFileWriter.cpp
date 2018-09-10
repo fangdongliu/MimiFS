@@ -30,7 +30,7 @@ int MiniFileWriter::getBlockMaxWriteSize() {
 	return MiniFile::op.getBlockSize() - sizeof(BlockHead);
 }
 
-int MiniFileWriter::writeToBlock(char*bytes, int bytecount) {
+int MiniFileWriter::writeToBlock(const char*bytes, int bytecount) {
 
 	if (bytecount > getBlockMaxWriteSize()) {
 		return 0;

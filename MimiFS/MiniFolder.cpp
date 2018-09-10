@@ -159,7 +159,7 @@ int MiniFolder::deleteForever() {
 	for (auto i : childs) {
 
 		if (i.second) {
-			i.second->deleteForever();
+			count+=i.second->deleteForever();
 			delete i.second;
 			count++;
 		}

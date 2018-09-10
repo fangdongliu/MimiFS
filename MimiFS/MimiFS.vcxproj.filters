@@ -94,7 +94,19 @@
       <Filter>头文件\Handler</Filter>
     </ClInclude>
     <ClInclude Include="HandleRename.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleWrite.h">
+      <Filter>头文件\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleRead.h">
+      <Filter>头文件\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleImport.h">
+      <Filter>头文件\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleExport.h">
+      <Filter>头文件\Handler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +168,18 @@
       <Filter>源文件\Handler</Filter>
     </ClCompile>
     <ClCompile Include="HandleRename.cpp">
+      <Filter>源文件\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleWrite.cpp">
+      <Filter>源文件\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleRead.cpp">
+      <Filter>源文件\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleExport.cpp">
+      <Filter>源文件\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleImport.cpp">
       <Filter>源文件\Handler</Filter>
     </ClCompile>
   </ItemGroup>

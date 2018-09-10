@@ -8,10 +8,10 @@ class MiniFolder:public MiniFile
 	friend MiniFile;
 protected:
 	MiniFolder();
-	void load();
+	
 public:
 	~MiniFolder();
-
+	void load();
 	void show()override;
 
 	std::string getAbsolutePath();

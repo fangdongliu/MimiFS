@@ -7,7 +7,7 @@ public:
 	~MiniFileWriter();
 	BlockHead head;
 	int getBlockMaxWriteSize();
-	int writeToBlock(char*bytes,int bytecount);
+	int writeToBlock(const char*bytes,int bytecount);
 
 private:
 	int remain;
