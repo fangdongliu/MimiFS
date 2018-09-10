@@ -3,7 +3,7 @@
 
 #include "MiniFileReader.h"
 
-REGISTER_HANDLER(HandleRead,"read","读取一个文件的数据","read \"filepath\"\nfilepath:要读取文件的数据")
+REGISTER_HANDLER(HandleRead, "read", "读取一个文件的数据", "read \"filepath\"\nfilepath:要读取文件的数据")
 
 HandleRead::HandleRead()
 {
@@ -59,12 +59,34 @@ void HandleRead::onHandleCommand(Lexer&param) {
 
 			int maxlen = reader.getBlockMaxReadSize();
 
-			char *buf = new char[maxlen+1];
+			unsigned char *buf = new unsigned char[maxlen + 4];
 
-			while (int n = reader.readABlock(buf)) {
-				buf[n] = 0;
-				cout << buf;
+			bool wMode = false;
+			char* old_locale = _strdup(setlocale(LC_CTYPE, NULL));
+
+			while (int n = reader.readABlock((char*)buf)) {
+				if (!wMode) {
+					for (int i = 0; i < n; i++) {
+						if (buf[i] > 127) {
+							wMode = true;
+							setlocale(LC_CTYPE, "");
+							break;
+
+						}
+					}
+				}
+				if (wMode) {
+					wchar_t *wBuf = (wchar_t *)buf;
+					wBuf[(n+1) / 2] = 0;
+					wprintf(L"%s",wBuf);
+				}
+				else {
+					buf[n] = 0;
+					cout << buf;
+				}
 			}
+			if (wMode)
+				setlocale(LC_CTYPE, old_locale);
 			cout << '\n';
 		}
 		catch (exception&e) {

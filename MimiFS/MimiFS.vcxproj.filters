@@ -42,9 +42,6 @@
     <ClInclude Include="ConsoleApp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CommandHandler.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="MiniFile.h">
       <Filter>头文件\MiniFS</Filter>
     </ClInclude>
@@ -106,6 +103,15 @@
       <Filter>头文件\Handler</Filter>
     </ClInclude>
     <ClInclude Include="HandleExport.h">
+      <Filter>头文件\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleAtt.h">
+      <Filter>头文件\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleMap.h">
       <Filter>头文件\Handler</Filter>
     </ClInclude>
   </ItemGroup>
@@ -180,6 +186,12 @@
       <Filter>源文件\Handler</Filter>
     </ClCompile>
     <ClCompile Include="HandleImport.cpp">
+      <Filter>源文件\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleAtt.cpp">
+      <Filter>源文件\Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleMap.cpp">
       <Filter>源文件\Handler</Filter>
     </ClCompile>
   </ItemGroup>

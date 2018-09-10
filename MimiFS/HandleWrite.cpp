@@ -63,17 +63,30 @@ void HandleWrite::onHandleCommand(Lexer&param) {
 
 			int maxlen = writer.getBlockMaxWriteSize();
 
-			int count = to.length()/maxlen;
+			
 
-			auto data = to.c_str();
+			char* utf8 = new char[to.length()*2];
+
+			wchar_t*unicode = new wchar_t[to.length() * 2];
+
+			Helper::ASCIIToUTF8(to.c_str(), utf8);
+
+			Helper::UTF8ToUnicode(utf8, unicode);
+
+			wstring wstr = unicode;
+			
+			
+			auto data = wstr.c_str();
+
+			int count = wstr.length()*2 / maxlen;
 
 			for (int i = 0; i < count; i++) {
-				writer.writeToBlock(data + i * maxlen, maxlen);
+				writer.writeToBlock((const char*)(data + i * maxlen), maxlen);
 			}
 
-			int remain = to.length() - count * maxlen;
+			int remain = wstr.length()*2 - count * maxlen;
 			if (remain > 0) {
-				writer.writeToBlock(data + count * maxlen, remain);
+				writer.writeToBlock((const char*)(data + count * maxlen), remain);
 			}
 
 			folder->updateDir();

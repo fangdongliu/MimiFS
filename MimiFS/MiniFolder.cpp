@@ -14,6 +14,35 @@ MiniFolder::~MiniFolder()
 	clear();
 }
 
+int MiniFolder::computeSize() {
+
+	int size = 0;
+
+	for (auto& i : childs) {
+
+		size += i.second->computeSize();
+
+	}
+
+	return size;
+}
+
+void MiniFolder::showAtt() {
+
+	using namespace std;
+
+	tm timeInfo;
+
+	localtime_s(&timeInfo,(const time_t*)&fileHead.createTime);
+
+	timeInfo.tm_year += 1900;
+
+	cout << fileHead.filename << " 文件夹大小：" << computeSize() << "bytes" << " 创建日期：" << timeInfo.tm_year << '-' 
+		<< timeInfo.tm_mon + 1
+		<< '-' << timeInfo.tm_mday << ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec<<endl;
+
+}
+
 void MiniFolder::show() {
 
 	using namespace std;

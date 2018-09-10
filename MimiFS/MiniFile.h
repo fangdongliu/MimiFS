@@ -8,7 +8,7 @@ struct BlockHead {
 struct MiniFileHead {
 	int type;
 	int blockId;
-	int createTime;
+	time_t createTime;
 	std::string filename;
 	int size;
 };
@@ -161,7 +161,10 @@ protected:
 	MiniFile();
 public:
 	~MiniFile();
+	virtual void showAtt();
 	virtual void show() {}
+	void showMap();
+	virtual int computeSize() { return fileHead.size; }
 	int computeHeadSize() { return 18 + fileHead.filename.length(); }
 	void setFilename(std::string&filename) { fileHead.filename = filename; }
 	std::string getFilename() { return fileHead.filename; }
@@ -169,7 +172,7 @@ public:
 	MiniFolder* getParent() { return parent; }
 
 	bool isFolder() { return fileHead.type == FS_FILETYPE_FOLDER; }
-	void moveTo(MiniFolder*);
+	
 	virtual int deleteForever();
 
 

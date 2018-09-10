@@ -13,6 +13,8 @@ public:
 	~MiniFolder();
 	void load();
 	void show()override;
+	int computeSize()override;
+	void showAtt()override;
 
 	std::string getAbsolutePath();
 
@@ -35,7 +37,6 @@ public:
 	MiniFile*& atChild(std::string&filename);
 	MiniFile*& getChild(std::string&filename);
 
-	MiniFolder* getFolderByRelativePath(std::vector<std::string>&nameList,bool queryCreateNew=true);
 
 private:
 	bool loaded;

@@ -149,11 +149,13 @@
   <ItemGroup>
     <ClInclude Include="CommandHandler.h" />
     <ClInclude Include="ConsoleApp.h" />
+    <ClInclude Include="HandleAtt.h" />
     <ClInclude Include="HandleCd.h" />
     <ClInclude Include="HandleDel.h" />
     <ClInclude Include="HandleDr.h" />
     <ClInclude Include="HandleExport.h" />
     <ClInclude Include="HandleImport.h" />
+    <ClInclude Include="HandleMap.h" />
     <ClInclude Include="HandleMd.h" />
     <ClInclude Include="HandleMf.h" />
     <ClInclude Include="HandleMv.h" />
@@ -176,11 +178,13 @@
   <ItemGroup>
     <ClCompile Include="CommandHandler.cpp" />
     <ClCompile Include="ConsoleApp.cpp" />
+    <ClCompile Include="HandleAtt.cpp" />
     <ClCompile Include="HandleCd.cpp" />
     <ClCompile Include="HandleDel.cpp" />
     <ClCompile Include="HandleDr.cpp" />
     <ClCompile Include="HandleExport.cpp" />
     <ClCompile Include="HandleImport.cpp" />
+    <ClCompile Include="HandleMap.cpp" />
     <ClCompile Include="HandleMd.cpp" />
     <ClCompile Include="HandleMf.cpp" />
     <ClCompile Include="HandleMv.cpp" />

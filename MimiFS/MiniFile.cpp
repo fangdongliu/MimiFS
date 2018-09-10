@@ -6,7 +6,7 @@ MiniFile::FileOperator MiniFile::op;
 
 MiniFile::MiniFile()
 {
-	fileHead.createTime = timeGetTime();
+	time(&fileHead.createTime);
 	fileHead.type = FS_FILETYPE_FILE;
 	fileHead.size = 0;
 }
@@ -21,6 +21,33 @@ int MiniFile::deleteForever() {
 	return 0;
 }
 
+void MiniFile::showMap() {
+
+	BlockHead blockHead;
+	blockHead.nextBlockId = fileHead.blockId;
+
+	while (blockHead.nextBlockId) {
+		std::cout << blockHead.nextBlockId << ' ';
+		op.seekBlock(blockHead.nextBlockId);
+		op.read(blockHead);
+	}
+
+}
+
+void MiniFile::showAtt() {
+
+	using namespace std;
+
+	tm timeInfo;
+
+	localtime_s(&timeInfo,(const time_t*)&fileHead.createTime);
+
+	timeInfo.tm_year += 1900;
+
+	cout << fileHead.filename << " 文件大小：" << computeSize() << "bytes" << " 创建日期：" << timeInfo.tm_year << '-'
+		<< timeInfo.tm_mon + 1
+		<< '-' << timeInfo.tm_mday << ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec << endl;
+}
 
 
 MiniFile* MiniFile::fromFileHead(MiniFileHead&head) {
