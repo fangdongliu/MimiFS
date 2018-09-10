@@ -28,6 +28,8 @@ public:
 
 	void clear();
 
+	bool isChildOf(MiniFolder*);
+
 	void updateDir();
 	bool isLoaded() { return loaded;}
 	MiniFile*& atChild(std::string&filename);

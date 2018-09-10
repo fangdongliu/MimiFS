@@ -16,7 +16,7 @@ MiniFile::~MiniFile()
 }
 
 int MiniFile::deleteForever() {
-
+	
 	op.releaseBlock(fileHead.blockId);
 	return 0;
 }

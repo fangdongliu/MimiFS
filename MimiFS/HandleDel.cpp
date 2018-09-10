@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HandleDel.h"
 
-REGISTER_HANDLER(HandleDel, "del", "删除指定文件(夹)", "del [-b] \"filename\" ...\n[-b]可选参数:开启模糊匹配")
+REGISTER_HANDLER(HandleDel, "del", "删除指定文件(夹)", "del [-b] \"filepath\" ...\n[-b]可选参数:开启模糊匹配")
 
 
 
@@ -81,6 +81,6 @@ void HandleDel::onHandleCommand(Lexer&param) {
 	}
 
 delError:
-	cout << "del \"filename\" ... \n";
+	cout << "del \"filepath\" ... \n";
 	return;
 }

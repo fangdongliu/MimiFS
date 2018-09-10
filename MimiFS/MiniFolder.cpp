@@ -33,7 +33,7 @@ void MiniFolder::show() {
 
 }
 
-void MiniFolder::findMatchFiles(std::string&pattern,std::vector<MiniFile*>&out) {
+void MiniFolder::findMatchFiles(std::string&pattern, std::vector<MiniFile*>&out) {
 
 	for (auto i : childs) {
 		if (i.second) {
@@ -153,13 +153,18 @@ int MiniFolder::deleteForever() {
 	if (!loaded) {
 		load();
 	}
-	
+
+	auto&current = ConsoleApp::getInstance()->current;
+	if (current->isChildOf(this)) {
+		current =parent;
+	}
+
 	int count = 0;
 
 	for (auto i : childs) {
 
 		if (i.second) {
-			count+=i.second->deleteForever();
+			count += i.second->deleteForever();
 			delete i.second;
 			count++;
 		}
@@ -170,6 +175,16 @@ int MiniFolder::deleteForever() {
 	return count;
 }
 
+bool MiniFolder::isChildOf(MiniFolder*f) {
+	auto p = this;
+	while (p) {
+		if (p == f) {
+			return true;
+		}
+		p = p->parent;
+	}
+	return false;
+}
 
 void MiniFolder::load() {
 
@@ -201,7 +216,7 @@ void MiniFolder::printTree(int depth) {
 	for (int i = 0; i < depth; i++) {
 		str += "¨U  ";
 	}
-	std::string str2= str + "¨d¨T";
+	std::string str2 = str + "¨d¨T";
 
 	for (auto i : childs) {
 
@@ -213,11 +228,11 @@ void MiniFolder::printTree(int depth) {
 		}
 
 	}
-	std::cout<<str << "¨]\n";
+	std::cout << str << "¨]\n";
 }
 
 bool MiniFolder::moveFrom(MiniFolder*other, std::string&filename) {
-	
+
 	using namespace std;
 
 	try {
