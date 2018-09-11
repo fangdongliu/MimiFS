@@ -43,13 +43,6 @@ Lexer::~Lexer()
 		std::cout << '\n';
 	}
 }
-
-bool Lexer::matchCountInRange(int a, int b/* =INT_MAX */)const {
-
-	return matchCount >= a && matchCount <= b;
-
-}
-
 bool Lexer::findSwitch(std::string&&s) {
 
 	try {

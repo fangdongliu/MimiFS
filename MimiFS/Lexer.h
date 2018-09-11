@@ -1,7 +1,7 @@
 #pragma once
 
 
-
+//词法分析器，用于提取命令
 class Lexer
 {
 public:
@@ -14,7 +14,6 @@ public:
 	
 	const std::string& getName()const { return name; }
 
-	bool matchCountInRange(int a, int b=INT_MAX)const;
 	bool findSwitch(std::string&&);
 
 	bool matchSuccess() { return !notMatch; }

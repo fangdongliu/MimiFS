@@ -173,7 +173,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TrashBin.h" />
-    <ClInclude Include="标头wdef.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandHandler.cpp" />

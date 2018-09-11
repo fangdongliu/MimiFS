@@ -1,10 +1,12 @@
 #pragma once
 
+//Block头结构体
 struct BlockHead {
 	int size;
 	int nextBlockId;
 };
 
+//文件头结构体
 struct MiniFileHead {
 	int type;
 	int blockId;
@@ -13,6 +15,8 @@ struct MiniFileHead {
 	int size;
 };
 
+
+//第一个Block头部
 struct SuperHead {
 	long fileSize;
 	int blockSize;
@@ -25,6 +29,7 @@ class ConsoleApp;
 class MiniFileWriter;
 class MiniFileReader;
 
+//基本的MiniFS 文件
 class MiniFile
 {
 	friend ConsoleApp;
@@ -63,7 +68,7 @@ protected:
 
 		bool ready() { return file != nullptr; }
 
-		void flush() {fseek(file, 0, SEEK_CUR);}
+		void flush() { fseek(file, 0, SEEK_CUR); }
 
 		template<typename T>
 		void write(T t) {
@@ -156,29 +161,38 @@ protected:
 	//静态对象，读写载入空间
 	static FileOperator op;
 
+	//从文件头创建文件，用于从外存中加载
 	static MiniFile* fromFileHead(MiniFileHead&);
 
 	MiniFile();
 public:
 	~MiniFile();
 
+	//计算文件大小
 	virtual int computeSize() { return fileHead.size; }
+
+	//显示文件属性(创建日期，大小)
 	virtual void showAtt();
-	virtual void show() {}
+
+	//永久删除外存中的文件
 	virtual int deleteForever();
 
+	//显示文件占用块号
 	void showMap();
+
+	//计算文件头大小
+	int computeHeadSize()const { return 18 + fileHead.filename.length(); }
+
+	//判断是否为文件夹
+	bool isFolder()const { return fileHead.type == FS_FILETYPE_FOLDER; }
+
+
+public:
+	//getter and setter
 	void setParent(MiniFolder*parent) { this->parent = parent; }
 	void setFilename(std::string&filename) { fileHead.filename = filename; }
-
-
-	int computeHeadSize() { return 18 + fileHead.filename.length(); }
-	MiniFolder* getParent() { return parent; }
-	std::string getFilename() { return fileHead.filename; }
-	bool isFolder() { return fileHead.type == FS_FILETYPE_FOLDER; }
-	
-	
-
+	MiniFolder* getParent()const { return parent; }
+	std::string getFilename()const { return fileHead.filename; }
 
 protected:
 	MiniFileHead fileHead;

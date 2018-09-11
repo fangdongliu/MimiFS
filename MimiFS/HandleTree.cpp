@@ -18,7 +18,7 @@ void HandleTree::onHandleCommand(Lexer&param) {
 	auto f = ConsoleApp::getInstance()->getFolderByPath(out);
 
 	if (f) {
-		cout << f->getFilename() << '\n';
+		printf("%s\n",f->getFilename().c_str());
 		f->printTree(0);
 	}
 	else

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HandleMap.h"
 
-REGISTER_HANDLER(HandleMap,"map","显示指定文件在空间所占用的全部块的\"块号\"","map filepath","filepath:要执行操作的文件")
+REGISTER_HANDLER(HandleMap,"map","显示文件所占用块的\"块号\"","map filepath","filepath:要执行操作的文件")
 
 HandleMap::HandleMap()
 {

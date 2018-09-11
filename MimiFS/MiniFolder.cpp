@@ -250,14 +250,14 @@ void MiniFolder::printTree(int depth) {
 	for (auto i : childs) {
 
 		if (i.second) {
-			std::cout << str2 + ' ' + i.first << '\n';
+			printf("%s %s\n", str2.c_str(), i.first.c_str());
 			if (i.second->isFolder()) {
 				((MiniFolder*)i.second)->printTree(depth + 1);
 			}
 		}
 
 	}
-	std::cout << str << "¨]\n";
+	printf("%s¨]\n", str.c_str());
 }
 
 bool MiniFolder::moveFrom(MiniFolder*other, std::string&filename) {

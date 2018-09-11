@@ -2,6 +2,8 @@
 #include "MiniFile.h"
 #include "MiniFolder.h"
 
+using namespace std;
+
 MiniFile::FileOperator MiniFile::op;
 
 MiniFile::MiniFile()
@@ -16,7 +18,6 @@ MiniFile::~MiniFile()
 }
 
 int MiniFile::deleteForever() {
-	
 	op.releaseBlock(fileHead.blockId);
 	return 0;
 }
@@ -36,17 +37,15 @@ void MiniFile::showMap() {
 
 void MiniFile::showAtt() {
 
-	using namespace std;
-
 	tm timeInfo;
 
 	localtime_s(&timeInfo,(const time_t*)&fileHead.createTime);
 
 	timeInfo.tm_year += 1900;
 
-	cout << fileHead.filename << " 文件大小：" << computeSize() << "bytes" << " 创建日期：" << timeInfo.tm_year << '-'
-		<< timeInfo.tm_mon + 1
-		<< '-' << timeInfo.tm_mday << ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec << '\n';
+	cout << fileHead.filename << " 文件大小：" << computeSize() << "bytes 创建日期：" 
+		<< timeInfo.tm_year << '-'<< timeInfo.tm_mon + 1<< '-' << timeInfo.tm_mday 
+		<< ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec << '\n';
 }
 
 
@@ -67,11 +66,11 @@ MiniFile* MiniFile::fromFileHead(MiniFileHead&head) {
 }
 
 void MiniFile::FileOperator::updateHead() {
+
 	seekBlock(0);
 	write(superHead);
 	flush();
 
-	using namespace std;
 	cout <<"空闲块个数"<< superHead.emptyBlockCount<<'\n';
 	cout <<"空闲块头部Id:" << superHead.firstEmptyBlockId<<"(0/1/2则出错)" <<'\n';
 }
@@ -107,22 +106,18 @@ void MiniFile::FileOperator::close() {
 }
 
 int MiniFile::FileOperator::requestEmptyBlock() {
-	//printf("first:%d,hasbefore:%d\n",superHead.firstEmptyBlockId, superHead.emptyBlockCount);
-
 
 	if (superHead.emptyBlockCount > 0) {
 		superHead.emptyBlockCount--;
 
-		
+		seekBlock(superHead.firstEmptyBlockId); //定位空闲链头部
 
-		seekBlock(superHead.firstEmptyBlockId);
-
-		BlockHead blockHead;
+		BlockHead blockHead;//读入BlockHead
 		read(blockHead);
 
 		superHead.firstEmptyBlockId = blockHead.nextBlockId;
 
-		reseekCurBlock();
+		reseekCurBlock();//重新定位头部以释放之
 
 		blockHead.nextBlockId = 0;
 		blockHead.size = 0;
@@ -134,11 +129,10 @@ int MiniFile::FileOperator::requestEmptyBlock() {
 	else {
 		throw std::exception("space not enough!");
 	}
-	//printf("first:%d,has:%d\n", superHead.firstEmptyBlockId, superHead.emptyBlockCount);
 }
 
 void MiniFile::FileOperator::releaseBlock(int blockId) {	
-	//printf("first:%d,hasbefore:%d\n", superHead.firstEmptyBlockId, superHead.emptyBlockCount);
+
 	superHead.emptyBlockCount++;
 	BlockHead blockHead;
 	seekBlock(blockId);
@@ -155,7 +149,6 @@ void MiniFile::FileOperator::releaseBlock(int blockId) {
 	write(blockHead);
 	flush();
 	superHead.firstEmptyBlockId = blockId;
-	//printf("first:%d,has:%d\n", superHead.firstEmptyBlockId, superHead.emptyBlockCount);
 }
 
 void MiniFile::FileOperator::seekBlock(int blockId) {

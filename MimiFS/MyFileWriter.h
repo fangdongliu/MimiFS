@@ -1,5 +1,7 @@
 #pragma once
 
+
+//封装的File写操作类
 class MyFileWriter
 {
 public:
@@ -7,11 +9,11 @@ public:
 	~MyFileWriter();
 
 public:
+	
+	void setBlockSize(int size) { blockSize = size; }//设置块大小
+	void seekBlock(int blockId);					//块定位
 
-	void setBlockSize(int size) { blockSize = size; }
-	void seekBlock(int blockId);
-
-	bool ready() { return file != nullptr; }
+	bool ready() { return file != nullptr; }		//判断就绪
 
 	template<typename T>
 	void write(T t) {
