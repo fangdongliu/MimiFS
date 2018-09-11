@@ -5,7 +5,7 @@
 using namespace std;
 using namespace experimental::filesystem;
 
-REGISTER_HANDLER(HandleExport,"export","将文件(夹)导出到外部","export \"filepath\" \"winFilepath\" \"filename\"\nfilepath:要导出MiniFS文件路径\nwinFilepath:外部路径\nfilename:导出后的文件(夹)名")
+REGISTER_HANDLER(HandleExport, "export", "将文件(夹)导出到外部", "export \"filepath\" \"winFilepath\" \"filename\"", "filepath:要导出MiniFS文件路径\nwinFilepath:外部路径\nfilename:导出后的文件(夹)名")
 
 
 HandleExport::HandleExport()
@@ -17,121 +17,95 @@ HandleExport::~HandleExport()
 {
 }
 
+
+
 void HandleExport::onHandleCommand(Lexer&param) {
 
 	cnt1 = 0;
 	cnt2 = 0;
 	string from, to;
 	string filename;
-	if (!param.nextTokenMatchString()) {
-		goto exportError;
+
+	param >= from >= to >= filename >= Lexer::end;
+
+	if (!param.matchSuccess())
+		throw CommandFormatError();
+
+	bool valid = false;
+
+	if (!Helper::isRightFilename(filename))
+		throw InvalidFilename();
+
+	std::vector<std::string>pathlist;
+	Helper::cutPathFromString(from, pathlist);
+	if (!pathlist.size()) {
+		cout << "目标文件不存在\n";
+		return;
 	}
-	from = param.str;
+	std::string filename2 = pathlist.back();
+	pathlist.pop_back();
 
-	if (!param.nextTokenMatchString()) {
-		goto exportError;
+	auto folder = ConsoleApp::getInstance()->getFolderByPath(pathlist, false);
+	if (!folder) {
+		cout << "目标文件不存在\n";
+		return;
 	}
-	to = param.str;
-
-	if (!param.nextTokenMatchString()) {
-		goto exportError;
-	}
-	filename = param.str;
-	if (!param.nextTokenMatchEnd())
-		goto exportError;
-
-	{
-		bool valid = false;
-
-		for (auto i : filename) {
-			if (!(i == ' ' || i == '.' || i == '\\' || i == '/' || i == '\t')) {
-				valid = true;
-				break;
-			}
+	try {
+		MiniFile* b = nullptr;
+		if (filename2 == ".") {
+			b = folder;
 		}
-
-		if (!valid) {
-			cout << "不合法的外部文件名\n";
-			return;
-		}
-
-		
-
-		{
-			std::vector<std::string>pathlist;
-			Helper::cutPathFromString(from, pathlist);
-			if (!pathlist.size()) {
-				cout << "目标文件不存在\n";
+		else if (filename2 == "..") {
+			if (folder->getParent() == nullptr) {
+				cout << "目标文件不存在";
 				return;
 			}
-			std::string filename2 = pathlist.back();
-			pathlist.pop_back();
-
-			auto folder = ConsoleApp::getInstance()->getFolderByPath(pathlist, false);
-			if (!folder) {
-				cout << "目标文件不存在\n";
-				return;
+			else {
+				b = folder->getParent();
 			}
-			try {
-				MiniFile* b=nullptr;
-				if (filename2 == ".") {
-					b = folder;
-				}
-				else if (filename2 == "..") {
-					if (folder->getParent() == nullptr) {
-						cout << "目标文件不存在";
-						return;
-					}
-					else {
-						b = folder->getParent();
-					}
-				}
-				else {
-					b = folder->atChild(filename2);
-				}
+		}
+		else {
+			b = folder->atChild(filename2);
+		}
 
-				
 
-				if (!b) {
-					throw exception();
-				}
 
-				path w(to);
-				path w2(to + "\\" + filename);
-				if (is_directory(w2) || is_regular_file(w2)) {
-					cout << "外部存在同名文件(夹)" << filename << "，是否删除之?[Y/N] ";
+		if (!b) {
+			throw exception();
+		}
 
-					string str;
-					getline(cin, str);
-					if (str.length() == 1 && (str[0] == 'Y' || str[0] == 'y')) {
-						remove_all(w);
-					}
-					else {
-						cout << "导出失败\n";
-						return;
-					}
+		path w(to);
+		path w2(to + "\\" + filename);
+		if (is_directory(w2) || is_regular_file(w2)) {
+			cout << "外部存在同名文件(夹)" << filename << "，是否删除之?[Y/N] ";
 
-				}
-
-				string relativePath = "\\";
-				string oldname = b->getFilename();
-				b->setFilename(filename);
-				doExport(relativePath, b, w);
-				b->setFilename(oldname);
-				cout << "导出文件夹数：" << cnt1 << endl;
-				cout << "导出文件数：" << cnt2 << endl;
+			string str;
+			getline(cin, str);
+			if (str.length() == 1 && (str[0] == 'Y' || str[0] == 'y')) {
+				remove_all(w);
 			}
-			catch (exception&e) {
-				cout << "目标文件不存在\n";
+			else {
+				cout << "导出失败\n";
 				return;
 			}
 
-
-			return;
 		}
+
+		string relativePath = "\\";
+		string oldname = b->getFilename();
+		b->setFilename(filename);
+		doExport(relativePath, b, w);
+		b->setFilename(oldname);
+		cout << "导出文件夹数：" << cnt1 << '\n';
+		cout << "导出文件数：" << cnt2 << '\n';
 	}
-exportError:
-	cout << "export \"filepath\" \"winFilepath\" \"filename\"";
+	catch (exception&e) {
+		cout << "目标文件不存在\n";
+		return;
+	}
+
+
+
 }
 
 void HandleExport::doExport(std::string& relativePath, MiniFile*f, path&winPath) {
@@ -155,13 +129,13 @@ void HandleExport::doExport(std::string& relativePath, MiniFile*f, path&winPath)
 		}
 	}
 	else {
-		FILE *out=nullptr;
+		FILE *out = nullptr;
 		if (!fopen_s(&out, (winPath.string() + relativePath + f->getFilename()).c_str(), "wb")) {
 			MiniFileReader reader(f);
-			char *buf=new char[reader.getBlockMaxReadSize()+2];
-			
-			int n=0;
-			while (n=reader.readABlock(buf)) {
+			char *buf = new char[reader.getBlockMaxReadSize() + 2];
+
+			int n = 0;
+			while (n = reader.readABlock(buf)) {
 				fwrite(buf, 1, n, out);
 			}
 			fclose(out);

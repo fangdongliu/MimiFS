@@ -11,34 +11,28 @@ class ConsoleApp SINGLE_INSTANCE
 	ConsoleApp &operator=(const ConsoleApp& src) {};
 
 public:
-	static ConsoleApp * getInstance() {
-		if (!instance) {
-			instance = new ConsoleApp;
-		}
-		return instance;
-	}
+	static ConsoleApp * getInstance();//获取App单例
 
-	void handleCommand(std::string&);
-
-	void addHandler(CommandHandler*);
-
-	void showFSInfo(Lexer&);
-	void showHelp(Lexer&);
-	void createMiniFS(Lexer&);
-	void mountMiniFS(Lexer&);
-
-	void closeMiniFS(Lexer&);
-	void formatMiniFS(Lexer&);
-
-	void printPrefix();
-
-	MiniFolder* getFolderByPath(std::vector<std::string>&,bool queryCreateNew=true);
+	void handleCommand(Lexer&);			//处理命令
+	void addHandler(CommandHandler*);	//添加处理器
+	void printPrefix();					//显示控制台前缀
+	
+	MiniFile* getFileByPath(std::vector<std::string>&);
+	MiniFolder* getFolderByPath(std::vector<std::string>&,bool queryCreateNew=true);//根据路径获取对应文件夹
 
 	std::unordered_map<std::string, CommandHandler*>handler;
 	std::unordered_map<std::string, HelpItem>helpList;
 
 	RootFolder root;
-	TrashBin trashBin;
-	MiniFolder *current;
+	//TrashBin trashBin;
+	MiniFolder *current;//当前目录
 
+protected:
+	void closeMiniFS(Lexer&);			 //关闭系统
+	void formatMiniFS(Lexer&);			 //格式化系统
+	void showHelp(Lexer&);				 //显示帮助
+	void createMiniFS(Lexer&);			 //创建MiniFS空间
+	void mountMiniFS(Lexer&);			 //装载MiniFS空间
+	void showFSInfo(Lexer&);			 //显示系统属性
+	bool ready();
 };

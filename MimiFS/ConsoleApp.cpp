@@ -1,26 +1,40 @@
 #include "stdafx.h"
 #include "ConsoleApp.h"
 #include "CommandHandler.h"
+
+using namespace std;
+
 ConsoleApp* ConsoleApp::instance = nullptr;
+
+ConsoleApp * ConsoleApp::getInstance() {
+	if (!instance) {
+		instance = new ConsoleApp;
+	}
+	return instance;
+}
 
 ConsoleApp::ConsoleApp() {
 
 	helpList["close"] = { "关闭MiniFS系统","" };
-	helpList["create"] = { "创建一个MiniFS系统","create \"filename\" [fileSize] [blockSize]\nfilename : 要创建系统的文件名\nfileSize : 系统的文件大小\nblockSize : 系统每个块的大小" };
-	helpList["mount"] = { "装载一个MiniFS系统","mount \"filename\"\nfilename : 要装载系统的文件名" };
-	helpList["help"] = { "显示帮助","help [\"cmd\"]\ncmd : 可选参数，若指定则查看其详细情况，否则列出所有命令" };
-	helpList["fmt"] = { "格式化MiniFS系统","fmt [fileSize] [blockSize]\nfileSize : 系统的文件大小\nblockSize : 系统每个块的大小" };
-	helpList["info"] = { "显示MiniFS系统状态信息","" };
+	helpList["create"] = { "创建一个MiniFS系统","create \"filename\" [fileSize] [blockSize]","filename : 要创建系统的文件名\nfileSize : 系统的文件大小\nblockSize : 系统每个块的大小" };
+	helpList["mount"] = { "装载一个MiniFS系统","mount \"filename\"","filename : 要装载系统的文件名" };
+	helpList["help"] = { "显示帮助","help [\"cmd\"]","cmd : 可选参数，若指定则查看其详细情况，否则列出所有命令" };
+	helpList["fmt"] = { "格式化MiniFS系统","fmt [fileSize] [blockSize]","fileSize : 系统的文件大小\nblockSize : 系统每个块的大小" };
+	helpList["info"] = { "显示MiniFS系统状态信息","info","" };
 
+}
+
+bool ConsoleApp::ready() {
+	return MiniFile::op.ready();
 }
 
 void ConsoleApp::printPrefix() {
 
 	if (MiniFile::op.ready()) {
-		if (current == &trashBin) {
+		/*if (current == &trashBin) {
 			std::cout << "trashBin:/ > ";
 		}
-		else {
+		else */ {
 			std::cout << current->getAbsolutePath() + " > ";
 		}
 	}
@@ -30,317 +44,268 @@ void ConsoleApp::printPrefix() {
 
 }
 
-void ConsoleApp::handleCommand(std::string&command) {
+void ConsoleApp::handleCommand(Lexer&lexer) {
 
-	using namespace std;
-
-	Lexer lexer(command);
-
-	if (lexer.nextTokenMatchEnd()) {
-		printPrefix();
-		return;
-	}
-	else if(lexer.token!=Lexer::Token::String){
-		cout << "wrong command" << std::endl;
-		goto handleCommandEnd;
-	}
-
-	
-	if (lexer.str == "mount") {
-		string no = "";
-		Lexer param2(no);
-		if (MiniFile::op.ready())
-			closeMiniFS(param2);
-		mountMiniFS(lexer);
-	}
-	else if (lexer.str == "create") {
-		createMiniFS(lexer);
-	}
-	else if (lexer.str == "help") {
-		showHelp(lexer);
-	}
-	else if (MiniFile::op.ready()) {
-		if (lexer.str == "fmt") {
+	try {
+		if (lexer.getName() == "mount")
+			mountMiniFS(lexer);
+		else if (lexer.getName() == "create")
+			createMiniFS(lexer);
+		else if (lexer.getName() == "help")
+			showHelp(lexer);
+		else if (!ready())
+			cout << "use \"mount\" to load a miniFS-space OR use \"create\" to create a miniFS-space\n";
+		else if (lexer.getName() == "fmt")
 			formatMiniFS(lexer);
-
-		}
-		else if (lexer.str == "close") {
+		else if (lexer.getName() == "close")
 			closeMiniFS(lexer);
-		}
-		else if (lexer.str == "info") {
+		else if (lexer.getName() == "info")
 			showFSInfo(lexer);
-		}
 		else {
 			CommandHandler *dealer = nullptr;
 
-			try
-			{
-				dealer = handler.at(lexer.str);
-			}
-			catch (const std::exception& e)
-			{
-				cout << "wrong command" << std::endl;
-				goto handleCommandEnd;
-			}
-
-			try
-			{
-				dealer->onHandleCommand(lexer);
-			}
-			catch (const std::exception& e)
-			{
-				cout << e.what() << std::endl;
-			}
+			dealer = handler.at(lexer.getName());
+			dealer->onHandleCommand(lexer);
+			if (ready())
+				MiniFile::op.updateHead();
 		}
-		if (MiniFile::op.ready())
-			MiniFile::op.updateHead();
 	}
-	else {
-		cout << "use \"mount\" to load a miniFS-space OR use \"create\" to create a miniFS-space" << std::endl;
+	catch (const out_of_range& e)
+	{
+		cout << "wrong command\n";
 	}
-handleCommandEnd:
-
-	cout << std::endl;
-	printPrefix();
-
+	catch (const CommandFormatError&e) {
+		cout << "command format error:\n";
+		cout << "the right usage : " << helpList[lexer.getName()].format<<'\n';
+	}
+	catch (const InvalidFilename&e) {
+		cout << "不合法的文件名\n";
+	}
+	catch (const std::exception& e) {
+		cout << e.what() << '\n';
+	}
 }
 
 void ConsoleApp::showFSInfo(Lexer&param) {
-	
-	using namespace std;
 
-	if (!param.nextTokenMatchEnd()) {
-		std::cout << "info need no param";
-		return;
-	}
+	param >= Lexer::end;
 
-	cout << "系统名 : " + MiniFile::op.filename<<endl;
-	cout << "空闲块个数" << MiniFile::op.superHead.emptyBlockCount << endl;
-	cout << "空闲块头部Id:" << MiniFile::op.superHead.firstEmptyBlockId << "(0/1/2则出错)" << endl;
+	if (!param.matchSuccess())
+		throw CommandFormatError();
+
+	cout << "系统名 : " + MiniFile::op.filename << '\n';
+	cout << "空闲块个数" << MiniFile::op.superHead.emptyBlockCount << '\n';
+	cout << "空闲块头部Id:" << MiniFile::op.superHead.firstEmptyBlockId << "(0/1/2则出错)" << '\n';
 
 }
 
 void ConsoleApp::showHelp(Lexer& param) {
 
-	using namespace std;
+	string cmd;
 
-	if (param.nextTokenMatchEnd()) {
-		for (auto i : helpList) {
-			cout << i.first << " : ";
-			cout << i.second.title << endl;
-		}
-	}
-	else if (param.matchString()) {
+	param > cmd >= Lexer::end;
+
+	if (!param.matchSuccess())
+		throw CommandFormatError();
+
+	if (cmd.length()) {
 		try
 		{
-			auto i = helpList.at(param.str);
-			cout << i.title << endl;
-			cout << i.detail << endl;
+			auto i = helpList.at(cmd);
+			cout << i.title << '\n';
+			cout << i.format << '\n';
+			cout << i.detail << '\n';
 		}
 		catch (const std::exception&)
 		{
-			cout << "目标命令不存在" << endl;
+			cout << "目标命令不存在" << '\n';
 		}
 	}
 	else {
-		cout << "help [\"command\"]\n";
+		string out;
+		for (auto i : helpList) {
+			out += i.first;
+			out += ' : ';
+			out += i.second.title;
+			out += ' ';
+			out += i.second.format;
+			out += '\n';
+		}
+		printf("%s",out.c_str());
 	}
 
 }
 
 void ConsoleApp::closeMiniFS(Lexer&param) {
 
-	if (!param.nextTokenMatchEnd()) {
-		std::cout << "close need no param";
-		return;
-	}
+	param >= Lexer::end;
+
+	if (!param.matchSuccess())
+		throw CommandFormatError();
+
 
 	MiniFile::op.close();
-	trashBin.clear();
 	root.clear();
 	current = &root;
-	std::cout << "miniFS 系统( " + MiniFile::op.filename + " )关闭" << std::endl;
+	std::cout << "miniFS 系统( " + MiniFile::op.filename + " )关闭" << '\n';
 
 }
 
 void ConsoleApp::formatMiniFS(Lexer& param) {
 
-	using namespace std;
-
 	SuperHead head;
 	head.fileSize = 1 << 30;
 	head.blockSize = 1 << 10;
 
-	if (param.nextTokenMatchNum()) {
-		head.fileSize = param.num;
+	param > head.fileSize > head.blockSize >= Lexer::end;
 
-		if (param.nextTokenMatchNum()) {
-			head.blockSize = param.num;
-		}
-		else if (!param.matchEnd()) {
-			goto fmtMiniFSERR;
-		}
-	}
-	else if (!param.matchEnd()) {
-		goto fmtMiniFSERR;
-	}
+	head.firstEmptyBlockId = 3;
+	head.emptyBlockCount = head.fileSize / head.blockSize - 2;
 
-	{
-		head.firstEmptyBlockId = 3;
-		head.emptyBlockCount = head.fileSize / head.blockSize - 2;
+	auto &f = MiniFile::op;
 
-		auto &f = MiniFile::op;
+	f.superHead = head;
+	f.seekBlock(0);
+	f.write(head);
 
-		f.superHead = head;
-		f.seekBlock(0);
-		f.write(head);
+	BlockHead blockHead;
+	blockHead.nextBlockId = 0;
+	blockHead.size = 0;
 
-		BlockHead blockHead;
-		blockHead.nextBlockId = 0;
-		blockHead.size = 0;
+	f.seekBlock(1);
+	f.write(blockHead);
 
-		f.seekBlock(1);
+	f.seekBlock(2);
+	f.write(blockHead);
+
+	for (int i = 3; i < head.emptyBlockCount + 3; i++) {
+		f.seekBlock(i);
+		blockHead.nextBlockId = i + 1;
 		f.write(blockHead);
-
-		f.seekBlock(2);
-		f.write(blockHead);
-
-		for (int i = 3; i < head.emptyBlockCount + 3; i++) {
-			f.seekBlock(i);
-			blockHead.nextBlockId = i + 1;
-			f.write(blockHead);
-		}
-
-		f.seekBlock(head.emptyBlockCount + 3);
-
-		blockHead.nextBlockId = 0;
-		f.write(blockHead);
-
-		root.clear();
-		trashBin.clear();
-		current = &root;
-
-		std::cout << "miniFS 系统( " + f.filename + " )格式化完成" << std::endl;
-		return;
 	}
-fmtMiniFSERR:
-	std::cout << "fmt [filesize] [blocksize]" << std::endl;
+
+	f.seekBlock(head.emptyBlockCount + 3);
+
+	blockHead.nextBlockId = 0;
+	f.write(blockHead);
+
+	root.clear();
+	current = &root;
+
+	std::cout << "miniFS 系统( " + f.filename + " )格式化完成" << '\n';
 }
 
 void ConsoleApp::mountMiniFS(Lexer& param) {
 
-	std::string filename;
+	string filename;
 
-	if (param.nextTokenMatchString()) {
-		filename = param.str;
+	param >= filename >= Lexer::end;
+
+	if (!param.matchSuccess())
+		throw CommandFormatError();
+
+	if (ready()) {
+		string close = "";
+		Lexer closeParam(close);
+		closeMiniFS(closeParam);
 	}
-	else goto mountMiniFSERR;
 
-	{
-		if (filename.length() < 3) {
-			filename += ".fs";
-		}
-		else if (!(filename[filename.length() - 1] == 's'&&filename[filename.length() - 2] == 'f'&&filename[filename.length() - 3] == '.')) {
-			filename += ".fs";
-		}
+	if (filename.length() < 3) {
+		filename += ".fs";
+	}
+	else if (filename.substr(filename.length() - 3) != ".fs") {
+		filename += ".fs";
+	}
 
-		MiniFile::op.open(filename);
 
-		if (!MiniFile::op.ready()) {
-			std::cout << "文件:" << filename << " 不存在或被占用" << std::endl;
-			return;
-		}
+	MiniFile::op.open(filename);
 
-		root.load();
-		trashBin.load();
-		current = &root;
-		std::cout << "miniFS 系统( " + filename + " )加载完毕" << std::endl;
-
+	if (!MiniFile::op.ready()) {
+		std::cout << "文件:" << filename << " 不存在或被占用" << '\n';
 		return;
 	}
 
-mountMiniFSERR:
-	std::cout << "mount \"filename\"" << std::endl;
+	root.load();
+	current = &root;
+	std::cout << "miniFS 系统( " + filename + " )加载完毕" << '\n';
+
 }
 
 void ConsoleApp::createMiniFS(Lexer& param) {
 
 	std::string filename;
+	SuperHead head;
+	head.fileSize = 1 << 30;
+	head.blockSize = 1 << 10;
 
-	if (param.nextTokenMatchString()) {
-		filename = param.str;
+	param >= filename > head.fileSize > head.blockSize >= Lexer::end;
+
+	if (filename.length() < 3) {
+		filename += ".fs";
 	}
-	else goto createMiniFSERR;
+	else if (filename.substr(filename.length() - 3) != ".fs") {
+		filename += ".fs";
+	}
 
-	{
-		if (filename.length() < 3) {
-			filename += ".fs";
-		}
-		else if (!(filename[filename.length() - 1] == 's'&&filename[filename.length() - 2] == 'f'&&filename[filename.length() - 3] == '.')) {
-			filename += ".fs";
-		}
-
-		MyFileWriter writer(filename);
-		if (!writer.ready()) {
-			return;
-		}
-
-		SuperHead head;
-		head.fileSize = 1 << 30;
-		head.blockSize = 1 << 10;
-
-		if (param.nextTokenMatchNum()) {
-			head.fileSize = param.num;
-
-			if (param.nextTokenMatchNum()) {
-				head.blockSize = param.num;
-			}
-			else if (!param.matchEnd()) {
-				goto createMiniFSERR;
-			}
-		}
-		else if (!param.matchEnd()) {
-			goto createMiniFSERR;
-		}
-
-		head.firstEmptyBlockId = 3;
-		head.emptyBlockCount = head.fileSize / head.blockSize - 2;
-
-		writer.write(head);
-		writer.setBlockSize(head.blockSize);
-
-		BlockHead blockHead;
-		blockHead.nextBlockId = 0;
-		blockHead.size = 0;
-
-		writer.seekBlock(1);
-
-		writer.write(blockHead);
-
-		writer.seekBlock(2);
-
-		writer.write(blockHead);
-
-		for (int i = 3; i < head.emptyBlockCount + 3; i++) {
-
-			writer.seekBlock(i);
-
-			blockHead.nextBlockId = i + 1;
-			writer.write(blockHead);
-
-		}
-
-		writer.seekBlock(head.emptyBlockCount + 3);
-
-		blockHead.nextBlockId = 0;
-		writer.write(blockHead);
-
-		std::cout << "miniFS 系统( " + filename + " )创建完成" << std::endl;
+	MyFileWriter writer(filename);
+	if (!writer.ready()) {
 		return;
 	}
+	head.firstEmptyBlockId = 3;
+	head.emptyBlockCount = head.fileSize / head.blockSize - 2;
 
-createMiniFSERR:
-	std::cout << "create \"filename\" [filesize] [blocksize]" << std::endl;
+	writer.write(head);
+	writer.setBlockSize(head.blockSize);
+
+	BlockHead blockHead;
+	blockHead.nextBlockId = 0;
+	blockHead.size = 0;
+
+	writer.seekBlock(1);
+
+	writer.write(blockHead);
+
+	writer.seekBlock(2);
+
+	writer.write(blockHead);
+
+	for (int i = 3; i < head.emptyBlockCount + 3; i++) {
+
+		writer.seekBlock(i);
+
+		blockHead.nextBlockId = i + 1;
+		writer.write(blockHead);
+
+	}
+
+	writer.seekBlock(head.emptyBlockCount + 3);
+
+	blockHead.nextBlockId = 0;
+	writer.write(blockHead);
+
+	std::cout << "miniFS 系统( " + filename + " )创建完成" << '\n';
+}
+
+MiniFile* ConsoleApp::getFileByPath(std::vector<std::string>&pathList) {
+	
+	string filename = pathList.back();
+	pathList.pop_back();
+
+	if (auto folder=getFolderByPath(pathList, false)) {
+
+		if (filename == ".") {
+			return folder;
+		}
+		else if (filename == "..") {
+			return folder->parent;
+		}
+		else {
+			return folder->atChild(filename);
+		}
+	}
+	else {
+		throw PathNotExist();
+	}
 
 }
 
@@ -359,9 +324,9 @@ MiniFolder* ConsoleApp::getFolderByPath(std::vector<std::string>&pathlist, bool 
 		dest = &root;
 		it++;
 	}
-	else if (*pathlist.begin() == "trashBin:"&&pathlist.size() == 1) {
+	/*else if (*pathlist.begin() == "trashBin:"&&pathlist.size() == 1) {
 		return &trashBin;
-	}
+	}*/
 
 	while (it != pathlist.end()) {
 		if (*it == "..") {

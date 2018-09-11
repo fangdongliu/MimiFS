@@ -46,7 +46,7 @@ void MiniFile::showAtt() {
 
 	cout << fileHead.filename << " 文件大小：" << computeSize() << "bytes" << " 创建日期：" << timeInfo.tm_year << '-'
 		<< timeInfo.tm_mon + 1
-		<< '-' << timeInfo.tm_mday << ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec << endl;
+		<< '-' << timeInfo.tm_mday << ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec << '\n';
 }
 
 
@@ -72,8 +72,8 @@ void MiniFile::FileOperator::updateHead() {
 	flush();
 
 	using namespace std;
-	cout <<"空闲块个数"<< superHead.emptyBlockCount<<endl;
-	cout <<"空闲块头部Id:" << superHead.firstEmptyBlockId<<"(0/1/2则出错)" <<endl;
+	cout <<"空闲块个数"<< superHead.emptyBlockCount<<'\n';
+	cout <<"空闲块头部Id:" << superHead.firstEmptyBlockId<<"(0/1/2则出错)" <<'\n';
 }
 
 void MiniFile::FileOperator::reseekCurBlock() {

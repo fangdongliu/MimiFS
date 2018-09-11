@@ -1,21 +1,18 @@
 #include "stdafx.h"
 #include "HandleCd.h"
 
-REGISTER_HANDLER(HandleCd, "cd", "切换当前目录", "cd \"path\"\npath:相对路径或者绝对路径")
+using namespace std;
+
+REGISTER_HANDLER(HandleCd, "cd", "切换当前目录", "cd \"path\"","path:相对路径或者绝对路径")
 
 void HandleCd::onHandleCommand(Lexer&param) {
 
-	using namespace std;
-
 	string pathname;
 
-	if (param.nextTokenMatchString()&&param.nextTokenMatchEnd()) {
-		pathname = param.str;
-	}
-	else {
-		cout << "cd \"path\"\n";
-		return;
-	}
+	param > pathname >= Lexer::end;
+
+	if (!param.matchSuccess())
+		throw CommandFormatError();
 
 	vector<string>out;
 	Helper::cutPathFromString(pathname, out);

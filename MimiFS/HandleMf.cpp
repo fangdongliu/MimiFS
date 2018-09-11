@@ -1,51 +1,39 @@
 #include "stdafx.h"
 #include "HandleMf.h"
 
-REGISTER_HANDLER(HandleMf,"mf","创建一个新的文件","mf \"filename\"\nfilename:要创建文件的文件名")
+REGISTER_HANDLER(HandleMf, "mf", "创建一个新的文件", "mf \"filepath\"","filepath:要创建文件的路径")
 
 void HandleMf::onHandleCommand(Lexer&param) {
 
 	using namespace std;
 
-	if (param.nextToken() == Lexer::Token::None) {
-		goto mfError;
-	}
-	switch (param.token)
-	{
-	case Lexer::Token::RealString:
-	case Lexer::Token::String: {
+	string filepath;
 
-		vector<string>out;
+	param >= filepath >= Lexer::end;
 
-		Helper::cutPathFromString(param.str, out);
-		if (out.size()) {
-			string filename = out.back();
+	vector<string>out;
 
-			out.pop_back();
+	Helper::cutPathFromString(filepath, out);
+	if (out.size()) {
+		string filename = out.back();
 
-			auto f = ConsoleApp::getInstance()->getFolderByPath(out);
+		out.pop_back();
 
-			if (!f) {
-				cout << "创建失败\n";
-			}
+		auto f = ConsoleApp::getInstance()->getFolderByPath(out);
 
-			auto child = f->getChild(filename);
-			if (child) {
-				cout << "目标文件已存在\n";
-			}
-			else {
-				f->createChildFile(filename);
-				f->updateDir();
-			}
-			return;
+		if (!f) {
+			cout << "创建失败\n";
+		}
+
+		auto child = f->getChild(filename);
+		if (child) {
+			cout << "目标文件已存在\n";
+		}
+		else {
+			f->createChildFile(filename);
+			f->updateDir();
 		}
 	}
-	default:
-		goto mfError;
-	}
 
-mfError:
-	cout << "mf \"filename\"  \n";
-	return;
 
 }

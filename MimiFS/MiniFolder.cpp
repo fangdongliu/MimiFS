@@ -39,7 +39,7 @@ void MiniFolder::showAtt() {
 
 	cout << fileHead.filename << " 文件夹大小：" << computeSize() << "bytes" << " 创建日期：" << timeInfo.tm_year << '-' 
 		<< timeInfo.tm_mon + 1
-		<< '-' << timeInfo.tm_mday << ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec<<endl;
+		<< '-' << timeInfo.tm_mday << ' ' << timeInfo.tm_hour << ':' << timeInfo.tm_min << ':' << timeInfo.tm_sec<<'\n';
 
 }
 
@@ -51,10 +51,10 @@ void MiniFolder::show() {
 
 		if (i.second) {
 			if (i.second->isFolder()) {
-				cout << "/" << i.first << endl;
+				cout << "/" << i.first << '\n';
 			}
 			else {
-				cout << i.first << "     " << i.second->fileHead.size << "byte" << endl;
+				cout << i.first << "     " << i.second->fileHead.size << "byte" << '\n';
 			}
 		}
 
@@ -250,7 +250,7 @@ void MiniFolder::printTree(int depth) {
 	for (auto i : childs) {
 
 		if (i.second) {
-			std::cout << str2 + ' ' + i.first << std::endl;
+			std::cout << str2 + ' ' + i.first << '\n';
 			if (i.second->isFolder()) {
 				((MiniFolder*)i.second)->printTree(depth + 1);
 			}

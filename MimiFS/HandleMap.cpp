@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HandleMap.h"
 
-REGISTER_HANDLER(HandleMap,"map","显示指定文件在空间所占用的全部块的\"块号\"","map filepath\nfilepath:要执行操作的文件")
+REGISTER_HANDLER(HandleMap,"map","显示指定文件在空间所占用的全部块的\"块号\"","map filepath","filepath:要执行操作的文件")
 
 HandleMap::HandleMap()
 {
@@ -18,13 +18,7 @@ void HandleMap::onHandleCommand(Lexer&param) {
 
 	string pathname;
 
-	if (param.nextTokenMatchString() && param.nextTokenMatchEnd()) {
-		pathname = param.str;
-	}
-	else {
-		cout << "map \"filepath\"\n";
-		return;
-	}
+	param >= pathname >= Lexer::end;
 
 	vector<string>out;
 	Helper::cutPathFromString(pathname, out);
@@ -44,7 +38,7 @@ void HandleMap::onHandleCommand(Lexer&param) {
 				cout << "文件:" << b->getFilename() << " 所占盘块为：\n";
 			}
 			b->showMap();
-			cout << endl;
+			cout << '\n';
 		}
 		catch (exception&e) {
 			cout << "目标文件不存在\n";

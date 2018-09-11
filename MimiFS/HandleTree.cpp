@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HandleTree.h"
 
-REGISTER_HANDLER(HandleTree,"tree","以树形方式递归显示目录","tree [\"filepath\"]\nfilepath：可选参数，目标文件夹")
+REGISTER_HANDLER(HandleTree,"tree","以树形方式递归显示目录","tree [\"filepath\"]","filepath：可选参数，目标文件夹")
 
 
 void HandleTree::onHandleCommand(Lexer&param) {
@@ -10,17 +10,7 @@ void HandleTree::onHandleCommand(Lexer&param) {
 
 	string pathname;
 
-	if (param.nextTokenMatchString()) {
-		if (!param.nextTokenMatchEnd()) {
-			cout << "tree \"path\"\n";
-			return;
-		}
-		pathname = param.str;
-	}
-	else if (!param.matchEnd()) {
-		cout << "tree \"path\"\n";
-		return;
-	}
+	param > pathname >= Lexer::end;
 
 	vector<string>out;
 	Helper::cutPathFromString(pathname, out);
@@ -28,7 +18,7 @@ void HandleTree::onHandleCommand(Lexer&param) {
 	auto f = ConsoleApp::getInstance()->getFolderByPath(out);
 
 	if (f) {
-		cout << f->getFilename() << endl;
+		cout << f->getFilename() << '\n';
 		f->printTree(0);
 	}
 	else

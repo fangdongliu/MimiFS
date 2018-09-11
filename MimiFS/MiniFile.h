@@ -32,6 +32,7 @@ class MiniFile
 	friend MiniFileWriter;
 	friend MiniFileReader;
 protected:
+	//封装文件读写操作
 	class FileOperator {
 		friend ConsoleApp;
 		friend MiniFileWriter;
@@ -62,9 +63,7 @@ protected:
 
 		bool ready() { return file != nullptr; }
 
-		void flush() {
-			fseek(file, 0, SEEK_CUR);
-		}
+		void flush() {fseek(file, 0, SEEK_CUR);}
 
 		template<typename T>
 		void write(T t) {
@@ -154,6 +153,7 @@ protected:
 		}
 	};
 
+	//静态对象，读写载入空间
 	static FileOperator op;
 
 	static MiniFile* fromFileHead(MiniFileHead&);
@@ -161,19 +161,23 @@ protected:
 	MiniFile();
 public:
 	~MiniFile();
+
+	virtual int computeSize() { return fileHead.size; }
 	virtual void showAtt();
 	virtual void show() {}
-	void showMap();
-	virtual int computeSize() { return fileHead.size; }
-	int computeHeadSize() { return 18 + fileHead.filename.length(); }
-	void setFilename(std::string&filename) { fileHead.filename = filename; }
-	std::string getFilename() { return fileHead.filename; }
-	void setParent(MiniFolder*parent) { this->parent = parent; }
-	MiniFolder* getParent() { return parent; }
+	virtual int deleteForever();
 
+	void showMap();
+	void setParent(MiniFolder*parent) { this->parent = parent; }
+	void setFilename(std::string&filename) { fileHead.filename = filename; }
+
+
+	int computeHeadSize() { return 18 + fileHead.filename.length(); }
+	MiniFolder* getParent() { return parent; }
+	std::string getFilename() { return fileHead.filename; }
 	bool isFolder() { return fileHead.type == FS_FILETYPE_FOLDER; }
 	
-	virtual int deleteForever();
+	
 
 
 protected:
