@@ -3,6 +3,7 @@
 //Block头结构体
 struct BlockHead {
 	int size;
+	int arraySize;
 	int nextBlockId;
 };
 
@@ -22,6 +23,7 @@ struct SuperHead {
 	int blockSize;
 	int firstEmptyBlockId;
 	int emptyBlockCount;
+	int maxReachBlock;
 };
 
 class MiniFolder;
@@ -61,10 +63,12 @@ protected:
 		void seekBlock(int blockId);
 		void reseekCurBlock();
 
+		void getEmptyBlockIds(std::vector<std::pair<int,int>>&,int maxCount);
+
 		int getBlockSize() { return superHead.blockSize; }
 
 		void releaseBlock(int blockId);
-		int requestEmptyBlock();
+		int requestEmptyBlock(int count);
 
 		bool ready() { return file != nullptr; }
 
@@ -178,7 +182,7 @@ public:
 	virtual int deleteForever();
 
 	//显示文件占用块号
-	void showMap();
+	void showMap(std::vector<int>&);
 
 	//计算文件头大小
 	int computeHeadSize()const { return 18 + fileHead.filename.length(); }

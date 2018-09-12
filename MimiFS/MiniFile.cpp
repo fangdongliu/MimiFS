@@ -22,13 +22,13 @@ int MiniFile::deleteForever() {
 	return 0;
 }
 
-void MiniFile::showMap() {
+void MiniFile::showMap(std::vector<int>&blockIds) {
 
 	BlockHead blockHead;
 	blockHead.nextBlockId = fileHead.blockId;
 
 	while (blockHead.nextBlockId) {
-		std::cout << blockHead.nextBlockId << ' ';
+		blockIds.push_back(blockHead.nextBlockId);
 		op.seekBlock(blockHead.nextBlockId);
 		op.read(blockHead);
 	}
@@ -63,6 +63,22 @@ MiniFile* MiniFile::fromFileHead(MiniFileHead&head) {
 		return folder;
 	}
 
+}
+
+void MiniFile::FileOperator::getEmptyBlockIds(std::vector<std::pair<int,int>>&ids, int maxCount) {
+
+//	BlockHead head;
+//
+//	head.nextBlockId = superHead.firstEmptyBlockId;
+//
+//	int n = max(superHead.emptyBlockCount, maxCount);
+////	int last = ids;
+//	while (n--) {
+//		seekBlock(head.nextBlockId);
+//		ids.push_back(head.nextBlockId);
+//		read(head);
+//	}
+	
 }
 
 void MiniFile::FileOperator::updateHead() {
@@ -105,26 +121,50 @@ void MiniFile::FileOperator::close() {
 	}
 }
 
-int MiniFile::FileOperator::requestEmptyBlock() {
+int MiniFile::FileOperator::requestEmptyBlock(int count) {
 
-	if (superHead.emptyBlockCount > 0) {
-		superHead.emptyBlockCount--;
+	if (superHead.emptyBlockCount > count) {
+		superHead.emptyBlockCount-=count;
 
-		seekBlock(superHead.firstEmptyBlockId); //定位空闲链头部
+		int ans = superHead.firstEmptyBlockId;
 
 		BlockHead blockHead;//读入BlockHead
-		read(blockHead);
+		blockHead.arraySize = 0;
+		blockHead.nextBlockId = superHead.firstEmptyBlockId;
 
-		superHead.firstEmptyBlockId = blockHead.nextBlockId;
 
-		reseekCurBlock();//重新定位头部以释放之
+		do {
+			count -= blockHead.arraySize;
+			seekBlock(blockHead.nextBlockId);
+			read(blockHead);
+		} while (blockHead.arraySize < count);
 
-		blockHead.nextBlockId = 0;
-		blockHead.size = 0;
+		if (count == blockHead.arraySize) {
+			superHead.firstEmptyBlockId = blockHead.nextBlockId;
+			blockHead.nextBlockId = 0;
+			blockHead.size = 0;
+			reseekCurBlock();
+			write(blockHead);
+			flush();
+		}
+		else {
+			superHead.firstEmptyBlockId = currentBlockId + count;
 
-		write(blockHead);
-		flush();
-		return currentBlockId;
+			BlockHead blockHead2 = blockHead;
+			blockHead2.arraySize -= count;
+
+			blockHead.arraySize = count;
+			blockHead.nextBlockId = 0;
+			blockHead.size = 0;
+			reseekCurBlock();
+			write(blockHead);
+
+			seekBlock(superHead.firstEmptyBlockId);
+			write(blockHead2);
+			flush();
+		}
+
+		return ans;
 	}
 	else {
 		throw std::exception("space not enough!");
@@ -133,16 +173,14 @@ int MiniFile::FileOperator::requestEmptyBlock() {
 
 void MiniFile::FileOperator::releaseBlock(int blockId) {	
 
-	superHead.emptyBlockCount++;
 	BlockHead blockHead;
-	seekBlock(blockId);
-	read(blockHead);
+	blockHead.nextBlockId = blockId;
 
-	while (blockHead.nextBlockId) {
-		superHead.emptyBlockCount++;
+	do {
 		seekBlock(blockHead.nextBlockId);
 		read(blockHead);
-	}
+		superHead.emptyBlockCount += blockHead.arraySize;
+	} while (blockHead.nextBlockId);
 
 	reseekCurBlock();
 	blockHead.nextBlockId = superHead.firstEmptyBlockId;

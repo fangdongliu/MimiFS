@@ -15,7 +15,7 @@ public:
 	virtual ~MiniFolder();
 
 	//创建子文件
-	MiniFile* createChildFile(std::string& filename);
+	MiniFile* createChildFile(std::string& filename,int blockCount);
 
 	//创建子文件夹
 	MiniFolder* createChildFolder(std::string& filename);

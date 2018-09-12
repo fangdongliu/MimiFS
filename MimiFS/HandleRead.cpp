@@ -58,7 +58,7 @@ void HandleRead::onHandleCommand(Lexer&param) {
 
 		bool wMode = false;
 		char* old_locale = _strdup(setlocale(LC_CTYPE, NULL));
-
+		
 		while (int n = reader.readABlock((char*)buf)) {
 			if (!wMode) {
 				for (int i = 0; i < n; i++) {

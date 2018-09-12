@@ -37,7 +37,11 @@ void HandleMap::onHandleCommand(Lexer&param) {
 			else {
 				cout << "文件:" << b->getFilename() << " 所占盘块为：\n";
 			}
-			b->showMap();
+			std::vector<int>maps;
+			b->showMap(maps);
+			for (auto i : maps) {
+				printf("%d ", i);
+			}
 			cout << '\n';
 		}
 		catch (exception&e) {

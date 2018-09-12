@@ -104,9 +104,17 @@ void HandleCp::doCopy(MiniFile*from,MiniFolder*dest) {
 	}
 	else {
 		cnt1++;
-		auto file = dest->createChildFile(filename);
+
+	
+
+		
 
 		MiniFileReader reader(from);
+
+		int size = from->computeSize();
+		int blockCount = size / reader.getBlockMaxReadSize() + 1;
+
+		auto file = dest->createChildFile(filename,blockCount);
 
 		MiniFileWriter writer(file);
 

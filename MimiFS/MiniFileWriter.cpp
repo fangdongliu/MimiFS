@@ -5,6 +5,8 @@ MiniFileWriter::MiniFileWriter(MiniFile*file)
 {
 	head.size = 0;
 	curBlock = 0;
+	curHeadBlock = 0;
+	remainSpaceSize = 0;
 	head.nextBlockId = file->fileHead.blockId;
 	this->file = file;
 	file->fileHead.size = 0;
@@ -13,48 +15,58 @@ MiniFileWriter::MiniFileWriter(MiniFile*file)
 
 MiniFileWriter::~MiniFileWriter()
 {
-	if (curBlock) {
+	if (curHeadBlock) {
 
 		if (head.nextBlockId) {
 			MiniFile::op.releaseBlock(head.nextBlockId);
 			head.nextBlockId = 0;
 		}
 
-		MiniFile::op.seekBlock(curBlock);
+		MiniFile::op.seekBlock(curHeadBlock);
 		MiniFile::op.write(head);
 	}
 
 }
 
-int MiniFileWriter::getBlockMaxWriteSize() {
-	return MiniFile::op.getBlockSize() - sizeof(BlockHead);
+int MiniFileWriter::queryCurrentMaxWriteSize() {
+
+	if (remainSpaceSize == 0) {
+
+		if (!head.nextBlockId) {
+			head.nextBlockId = MiniFile::op.requestEmptyBlock(1);
+			MiniFile::op.seekBlock(curHeadBlock);
+			MiniFile::op.write(head);
+		}
+
+		curHeadBlock = head.nextBlockId;
+		curBlock = curHeadBlock;
+		MiniFile::op.seekBlock(head.nextBlockId);
+		MiniFile::op.read(head);
+		isHead = true;
+		remainSpaceSize = head.arraySize - 1;
+
+		return MiniFile::op.getBlockSize() - sizeof(BlockHead);
+	}
+	else {
+		isHead = false;
+		remainSpaceSize--;
+		curBlock++;
+		return MiniFile::op.getBlockSize();
+	}
 }
+
 
 int MiniFileWriter::writeToBlock(const char*bytes, int bytecount) {
 
-	if (bytecount > getBlockMaxWriteSize()) {
-		return 0;
-	}
-
-	if (!head.nextBlockId) {
-		head.nextBlockId= MiniFile::op.requestEmptyBlock();
-	}
-
-	if (curBlock) {
-		MiniFile::op.seekBlock(curBlock);
+	MiniFile::op.seekBlock(curBlock);
+	if (isHead) {
 		MiniFile::op.write(head);
 	}
-
-	curBlock = head.nextBlockId;
-	MiniFile::op.seekBlock(curBlock);
-	MiniFile::op.read(head);
-	MiniFile::op.flush();
-
 	fwrite(bytes, 1, bytecount, MiniFile::op.file);
-	head.size = bytecount;
-
-	file->fileHead.size += bytecount;
+	head.size += bytecount;
 	
+	file->fileHead.size += bytecount;
+
 	return bytecount;
 
 }

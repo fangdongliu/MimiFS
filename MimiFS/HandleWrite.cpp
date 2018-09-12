@@ -51,9 +51,6 @@ void HandleWrite::onHandleCommand(Lexer&param) {
 
 		MiniFileWriter writer(b);
 
-		int maxlen = writer.getBlockMaxWriteSize();
-
-
 
 		char* utf8 = new char[to.length() * 2];
 
@@ -65,20 +62,28 @@ void HandleWrite::onHandleCommand(Lexer&param) {
 
 		wstring wstr = unicode;
 
-
 		auto data = wstr.c_str();
 
-		int count = wstr.length() * 2 / maxlen;
+		int remain = wstr.length() * 2;
 
-		for (int i = 0; i < count; i++) {
-			writer.writeToBlock((const char*)(data + i * maxlen), maxlen);
+		int cur=0;
+
+		while (remain > 0) {
+
+			int n = writer.queryCurrentMaxWriteSize();
+
+			if (remain > n) {
+				remain -= n;
+				writer.writeToBlock(((const char*)(data)) + cur, n);
+			}
+			else {
+				writer.writeToBlock(((const char*)(data)) + cur, remain);
+				remain = 0;
+			}
+			
+			cur += n;
+
 		}
-
-		int remain = wstr.length() * 2 - count * maxlen;
-		if (remain > 0) {
-			writer.writeToBlock((const char*)(data + count * maxlen), remain);
-		}
-
 		folder->updateDir();
 
 	}

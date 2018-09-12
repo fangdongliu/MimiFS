@@ -24,6 +24,11 @@ ConsoleApp::ConsoleApp() {
 
 }
 
+int ConsoleApp::getBlockSize() {
+
+	return MiniFile::op.getBlockSize();
+}
+
 bool ConsoleApp::ready() {
 	return MiniFile::op.ready();
 }
@@ -54,6 +59,8 @@ void ConsoleApp::handleCommand(Lexer&lexer) {
 			closeMiniFS(lexer);
 		else if (lexer.getName() == "info")
 			showFSInfo(lexer);
+		else if (lexer.getName() == "opt")
+			optFS(lexer);
 		else {
 			CommandHandler *dealer = nullptr;
 
@@ -79,6 +86,68 @@ void ConsoleApp::handleCommand(Lexer&lexer) {
 		cout << e.what() << '\n';
 	}
 }
+
+//bool ConsoleApp::doOpt(std::vector<int>emptys, MiniFile*f) {
+//
+//	if (f->isFolder()) {
+//
+//		bool needupdate = false;
+//
+//		for (auto i : ((MiniFolder*)f)->childs) {
+//			if (i.second) {
+//				needupdate |= doOpt(emptys, i.second);
+//			}
+//		}
+//
+//		if (needupdate) {
+//			((MiniFolder*)f)->updateDir();
+//		}
+//
+//		return false;
+//	}
+//	else {
+//
+//		std::vector<int>maps;
+//		f->showMap(maps);
+//
+//		int last = *maps.begin() - 1;
+//		bool ordered = true;
+//		for (auto i : maps) {
+//			if (i != last + 1) {
+//				ordered = false;
+//				break;
+//			}
+//			last++;
+//		}
+//
+//		if (ordered) {
+//			return false;
+//		}
+//
+//
+//
+//		for (int i = 0; i < maps.end(); i++) {
+//
+//		}
+//
+//	}
+//
+//
+//
+//}
+
+void ConsoleApp::optFS(Lexer&param) {
+
+	param >= Lexer::end;
+
+	vector<int>emptys;
+
+	//MiniFile::op.getEmptyBlockIds(emptys, 1000);
+
+
+
+}
+
 
 void ConsoleApp::showFSInfo(Lexer&param) {
 
@@ -112,7 +181,7 @@ void ConsoleApp::showHelp(Lexer& param) {
 	else {
 		string out;
 
-		std::vector<std::pair<std::string,HelpItem>>strs(helpList.begin(),helpList.end());
+		std::vector<std::pair<std::string, HelpItem>>strs(helpList.begin(), helpList.end());
 		std::sort(strs.begin(), strs.end(), [](std::pair<std::string, HelpItem>&a, std::pair<std::string, HelpItem>&b)->bool {
 			return a.first < b.first;
 		});
@@ -120,7 +189,7 @@ void ConsoleApp::showHelp(Lexer& param) {
 		char buf[100];
 
 		for (auto i : strs) {
-			sprintf_s(buf, "%- 8s : %- 24s %- 40s\n",i.first.c_str(),i.second.title.c_str(),i.second.format.c_str());
+			sprintf_s(buf, "%- 8s : %- 24s %- 40s\n", i.first.c_str(), i.second.title.c_str(), i.second.format.c_str());
 			printf(buf);
 		}
 	}
@@ -141,6 +210,7 @@ void ConsoleApp::closeMiniFS(Lexer&param) {
 void ConsoleApp::formatMiniFS(Lexer& param) {
 
 	SuperHead head;
+	head.maxReachBlock = 3;
 	head.fileSize = 1 << 30;
 	head.blockSize = 1 << 10;
 
@@ -151,11 +221,15 @@ void ConsoleApp::formatMiniFS(Lexer& param) {
 
 	auto &f = MiniFile::op;
 
+	root.clear();//重置内存根目录与当前目录
+	current = &root;
+
 	f.superHead = head;//写入文件头
 	f.seekBlock(0);
 	f.write(head);
 
 	BlockHead blockHead;
+	blockHead.arraySize = 1;
 	blockHead.nextBlockId = 0;
 	blockHead.size = 0;
 
@@ -165,20 +239,14 @@ void ConsoleApp::formatMiniFS(Lexer& param) {
 	f.seekBlock(2);		//覆盖回收站
 	f.write(blockHead);
 
+	blockHead.arraySize = head.emptyBlockCount;
 	//建立空闲链
-	for (int i = 3; i < head.emptyBlockCount + 3; i++) {
-		f.seekBlock(i);
-		blockHead.nextBlockId = i + 1;
-		f.write(blockHead);
-	}
-
-	blockHead.nextBlockId = 0;
-
-	f.seekBlock(head.emptyBlockCount + 3);//空闲链尾部结束
+	f.seekBlock(3);
 	f.write(blockHead);
 
-	root.clear();//重置内存根目录与当前目录
-	current = &root;
+	//文件尾部标记
+	f.seekBlock(head.emptyBlockCount + 3);
+	f.write<char>(0);
 
 	std::cout << "miniFS 系统( " + f.filename + " )格式化完成" << '\n';
 }
@@ -220,6 +288,7 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 
 	std::string filename;
 	SuperHead head;
+	head.maxReachBlock = 3;
 	head.fileSize = 1 << 30;
 	head.blockSize = 1 << 10;
 
@@ -230,39 +299,39 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 		filename += ".fs";
 	else if (filename.substr(filename.length() - 3) != ".fs")
 		filename += ".fs";
+	{
+		MyFileWriter writer(filename);
+		if (!writer.ready()) {
+			return;
+		}
+		head.firstEmptyBlockId = 3;
+		head.emptyBlockCount = head.fileSize / head.blockSize - 2;
 
-	MyFileWriter writer(filename);
-	if (!writer.ready()) {
-		return;
-	}
-	head.firstEmptyBlockId = 3;
-	head.emptyBlockCount = head.fileSize / head.blockSize - 2;
 
-	writer.write(head);//写入文件头
-	writer.setBlockSize(head.blockSize);
+		writer.write(head);//写入文件头
+		writer.setBlockSize(head.blockSize);
 
-	BlockHead blockHead;
-	blockHead.nextBlockId = 0;
-	blockHead.size = 0;
+		BlockHead blockHead;
+		blockHead.arraySize = 1;
+		blockHead.nextBlockId = 0;
+		blockHead.size = 0;
 
-	writer.seekBlock(1);//写入root目录
-	writer.write(blockHead);
-
-	writer.seekBlock(2);//写入回收站
-	writer.write(blockHead);
-
-	//建立空闲链
-	for (int i = 3; i < head.emptyBlockCount + 3; i++) {
-		writer.seekBlock(i);
-		blockHead.nextBlockId = i + 1;
+		writer.seekBlock(1);//写入root目录
 		writer.write(blockHead);
+
+		writer.seekBlock(2);//写入回收站
+		writer.write(blockHead);
+
+		blockHead.arraySize = head.emptyBlockCount;
+		//建立空闲链
+		writer.seekBlock(3);
+		writer.write(blockHead);
+
+		//文件尾部标记
+		writer.seekBlock(head.emptyBlockCount + 3);
+		writer.write<char>(0);
+	//	writer.seekBlock(0);
 	}
-
-	//空闲链尾部
-	blockHead.nextBlockId = 0;
-	writer.seekBlock(head.emptyBlockCount + 3);
-	writer.write(blockHead);
-
 	std::cout << "miniFS 系统( " + filename + " )创建完成" << '\n';
 }
 
@@ -310,7 +379,7 @@ MiniFolder* ConsoleApp::getFolderByPath(std::vector<std::string>&pathlist, bool 
 			dest = dest->getParent();
 		}
 		else if (*it != ".") {
-			try{
+			try {
 				auto ff = dest->childs.at(*it);
 
 				if (!ff)

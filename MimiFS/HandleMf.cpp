@@ -30,7 +30,7 @@ void HandleMf::onHandleCommand(Lexer&param) {
 			cout << "目标文件已存在\n";
 		}
 		else {
-			f->createChildFile(filename);
+			f->createChildFile(filename,1);
 			f->updateDir();
 		}
 	}

@@ -17,6 +17,8 @@ public:
 	void addHandler(CommandHandler*);	//添加处理器
 	void printPrefix();					//显示控制台前缀
 	
+	int getBlockSize();
+
 	MiniFile* getFileByPath(std::vector<std::string>&);
 	MiniFolder* getFolderByPath(std::vector<std::string>&,bool queryCreateNew=true);//根据路径获取对应文件夹
 
@@ -28,6 +30,7 @@ public:
 	MiniFolder *current;//当前目录
 
 protected:
+	void optFS(Lexer&);
 	void closeMiniFS(Lexer&);			 //关闭系统
 	void formatMiniFS(Lexer&);			 //格式化系统
 	void showHelp(Lexer&);				 //显示帮助
@@ -35,4 +38,6 @@ protected:
 	void mountMiniFS(Lexer&);			 //装载MiniFS空间
 	void showFSInfo(Lexer&);			 //显示系统属性
 	bool ready();
+
+	bool doOpt(std::vector<int>emptys,MiniFile*);
 };

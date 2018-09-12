@@ -12,5 +12,8 @@ public:
 
 private:
 	BlockHead head;
+	int currentBlockId;
+	int blockIdTobeRead;
+	int remainSize;
 };
 

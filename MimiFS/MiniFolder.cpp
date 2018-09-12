@@ -94,12 +94,12 @@ std::string MiniFolder::getAbsolutePath() {
 
 }
 
-MiniFile* MiniFolder::createChildFile(std::string& filename) {
+MiniFile* MiniFolder::createChildFile(std::string& filename,int blockCount) {
 	auto f = new MiniFile();
 	f->setParent(this);
 	childs[filename] = f;
 	f->fileHead.filename = filename;
-	f->fileHead.blockId = op.requestEmptyBlock();
+	f->fileHead.blockId = op.requestEmptyBlock(blockCount);
 	return f;
 }
 
@@ -109,7 +109,7 @@ MiniFolder* MiniFolder::createChildFolder(std::string& filename) {
 	childs[filename] = f;
 	f->loaded = true;
 	f->fileHead.filename = filename;
-	f->fileHead.blockId = op.requestEmptyBlock();
+	f->fileHead.blockId = op.requestEmptyBlock(1);
 	return f;
 }
 
@@ -135,7 +135,7 @@ void MiniFolder::updateDir() {
 	op.read(blockHead);
 	op.flush();
 	blockHead.size = 0;
-	remainSize = op.getBlockSize() - sizeof(BlockHead);
+	remainSize = op.getBlockSize()*blockHead.arraySize - sizeof(BlockHead);
 
 	for (auto& i : childs) {
 
@@ -147,7 +147,7 @@ void MiniFolder::updateDir() {
 		if (size > remainSize) {
 
 			if (!blockHead.nextBlockId)
-				blockHead.nextBlockId = op.requestEmptyBlock();
+				blockHead.nextBlockId = op.requestEmptyBlock(1);
 
 			op.reseekCurBlock();
 			op.write(blockHead);
@@ -157,7 +157,7 @@ void MiniFolder::updateDir() {
 			op.flush();
 
 			blockHead.size = 0;
-			remainSize = op.getBlockSize() - sizeof(BlockHead);
+			remainSize = op.getBlockSize()*blockHead.arraySize - sizeof(BlockHead);
 		}
 
 		remainSize -= size;
@@ -167,11 +167,13 @@ void MiniFolder::updateDir() {
 
 	}
 
+	int cur = op.currentBlockId;
+
 	if (blockHead.nextBlockId)
 		op.releaseBlock(blockHead.nextBlockId);
 
 	blockHead.nextBlockId = 0;
-	op.reseekCurBlock();
+	op.seekBlock(cur);
 	op.write(blockHead);
 	op.flush();
 
