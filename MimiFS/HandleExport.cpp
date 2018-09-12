@@ -115,7 +115,7 @@ void HandleExport::doExport(std::string& relativePath, MiniFile*f, path&winPath)
 			cnt1++;
 
 			auto folder = (MiniFolder*)f;
-			if (folder->isLoaded())
+			if (!folder->isLoaded())
 				folder->load();
 			vector<MiniFile*>files;
 			string pattern = "*";
@@ -130,7 +130,9 @@ void HandleExport::doExport(std::string& relativePath, MiniFile*f, path&winPath)
 	}
 	else {
 		FILE *out = nullptr;
-		if (!fopen_s(&out, (winPath.string() + relativePath + f->getFilename()).c_str(), "wb")) {
+		string filename = (winPath.string() + relativePath + f->getFilename());
+		if (!fopen_s(&out,filename.c_str() , "wb")) {
+			printf("正在导出:%s\n", filename.c_str());
 			MiniFileReader reader(f);
 			char *buf = new char[reader.getBlockMaxReadSize() + 2];
 
