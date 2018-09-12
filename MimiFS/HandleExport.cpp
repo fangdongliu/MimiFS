@@ -82,7 +82,7 @@ void HandleExport::onHandleCommand(Lexer&param) {
 			string str;
 			getline(cin, str);
 			if (str.length() == 1 && (str[0] == 'Y' || str[0] == 'y')) {
-				remove_all(w);
+				remove_all(w2);
 			}
 			else {
 				cout << "µ¼³öÊ§°Ü\n";

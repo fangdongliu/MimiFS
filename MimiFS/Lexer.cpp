@@ -208,7 +208,10 @@ Lexer::Token Lexer::nextToken() {
 			}
 			current++;
 		}
-		current++;
+
+
+		if (source[current] != 0)
+			current++;
 		return token = Token::RealString;
 	}
 
@@ -228,6 +231,8 @@ Lexer::Token Lexer::nextToken() {
 			}
 			current++;
 		}
+
+		if(source[current]!=0)
 		current++;
 		return token = Token::RealString;
 	}

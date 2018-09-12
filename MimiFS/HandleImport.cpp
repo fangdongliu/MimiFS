@@ -155,7 +155,7 @@ void HandleImport::importFile(MiniFolder*f, const std::experimental::filesystem:
 	FILE*file;
 
 	if (!fopen_s(&file, winPath.string().c_str(), "rb")) {
-
+		printf("正在导入文件:%s\n", winPath.string().c_str());
 		int filesize = getWinFileSize(file);
 
 		fseek(file, 0, SEEK_SET);
@@ -201,7 +201,7 @@ void HandleImport::importFile(MiniFolder*f, const std::experimental::filesystem:
 		
 		fclose(file);
 		cnt2++;
-		printf("导入文件:%s\n", winPath.string().c_str());
+		
 	}
 
 }

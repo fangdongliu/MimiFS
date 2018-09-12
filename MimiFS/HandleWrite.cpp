@@ -52,9 +52,9 @@ void HandleWrite::onHandleCommand(Lexer&param) {
 		MiniFileWriter writer(b);
 
 
-		char* utf8 = new char[to.length() * 2];
+		char* utf8 = new char[to.length() * 3];
 
-		wchar_t*unicode = new wchar_t[to.length() * 2];
+		wchar_t*unicode = new wchar_t[to.length() * 3];
 
 		Helper::ASCIIToUTF8(to.c_str(), utf8);
 
@@ -84,6 +84,9 @@ void HandleWrite::onHandleCommand(Lexer&param) {
 			cur += n;
 
 		}
+
+		delete utf8;
+		delete unicode;
 		folder->updateDir();
 
 	}

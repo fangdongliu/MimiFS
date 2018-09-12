@@ -212,7 +212,7 @@ void ConsoleApp::formatMiniFS(Lexer& param) {
 	SuperHead head;
 	head.maxReachBlock = 3;
 	head.fileSize = 1 << 30;
-	head.blockSize = 1 << 10;
+	head.blockSize = 1 << 12;
 
 	param > head.fileSize > head.blockSize >= Lexer::end;
 
@@ -290,7 +290,7 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 	SuperHead head;
 	head.maxReachBlock = 3;
 	head.fileSize = 1 << 30;
-	head.blockSize = 1 << 10;
+	head.blockSize = 1 << 12;
 
 	param >= filename > head.fileSize > head.blockSize >= Lexer::end;
 
