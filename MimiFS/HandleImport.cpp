@@ -4,7 +4,7 @@
 using namespace std;
 using namespace experimental::filesystem;
 
-REGISTER_HANDLER(HandleImport, "import", "将外部文件(夹)导入系统", "import \"winFilepath\" \"filepath\"", "winFilepath:外部路径\nfilepath:MiniFS文件路径")
+REGISTER_HANDLER(HandleImport, "import", "将外部文件(夹)导入系统", "import \"winFilepath\" \"filepath\" \"filename\"", "winFilepath:外部路径\nfilepath:MiniFS文件路径")
 
 HandleImport::HandleImport()
 {

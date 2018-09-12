@@ -151,6 +151,7 @@
     <ClInclude Include="ConsoleApp.h" />
     <ClInclude Include="HandleAtt.h" />
     <ClInclude Include="HandleCd.h" />
+    <ClInclude Include="HandleCp.h" />
     <ClInclude Include="HandleDel.h" />
     <ClInclude Include="HandleDr.h" />
     <ClInclude Include="HandleExport.h" />
@@ -179,6 +180,7 @@
     <ClCompile Include="ConsoleApp.cpp" />
     <ClCompile Include="HandleAtt.cpp" />
     <ClCompile Include="HandleCd.cpp" />
+    <ClCompile Include="HandleCp.cpp" />
     <ClCompile Include="HandleDel.cpp" />
     <ClCompile Include="HandleDr.cpp" />
     <ClCompile Include="HandleExport.cpp" />
