@@ -195,7 +195,7 @@ void HandleAtt::onHandleCommand(Lexer&param) {
 					else {
 						printf("大小：%d B\n", head.size);
 					}
-					printf("创建日期：%d-%02d-%02d %02d:%02d:%02d\n", timeInfo.tm_year, timeInfo.tm_mon, timeInfo.tm_mday
+					printf("创建日期：%d-%-02d-%-02d %-02d:%-02d:%-02d\n", timeInfo.tm_year, timeInfo.tm_mon, timeInfo.tm_mday
 						, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec
 					);
 				}
@@ -303,4 +303,4 @@ void HandleAtt::onHandleCommand(Lexer&param) {
 
 	}
 	
-}
+}fdgffdkldfdnlkmdfgfhgsdfghsdsfghjsdfdgfhjbv,mdfghj,.,mndbnabsdjfgadfgfadfgnkmledefjirottremkeodeeirtuhyjtugtriekfoewwkirjtjhnrjekeopwejrthnrtkjekwoqwejrngjhgkfmlwmendfgmjdkmlmenrgnfngjkdmdlenfgbjkdljfgnrfdfdghjhgfddsfghjlrmyg,b vskeritbhiojmfd smedfngtnbhnthmkrltg,fkn bggjtnasdfdgfhgfdsdfgfhgjhgfdsdfghjhhgfdsdfghjhjghffdxdsfdrjkrml,vfmg ntgrmkl, mngtrgkmlrm, mngtgrjkml,f mvgntgkml,f

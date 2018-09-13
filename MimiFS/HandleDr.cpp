@@ -19,41 +19,78 @@ void HandleDr::onHandleCommand(Lexer&param) {
 
 	vector<string>out;
 	Helper::cutPathFromString(folderpath, out);
-	if (blur) {
-		string filename;
+	string filename = "*";
+	MiniFolder*folder = nullptr;
 
+
+	if (blur) {
 		if (out.size()) {
 			filename = out.back();
 			out.pop_back();
-
-			auto folder = ConsoleApp::getInstance()->getFolderByPath(out);
-
-			if (folder) {
-				std::vector<MiniFile*>files;
-				folder->findMatchFiles(filename, files);
-				cout << "匹配文件数：" << files.size() << '\n';
-				for (auto i : files) {
-					if (i->isFolder()) 
-						cout << "/" << i->getFilename() << '\n';
-					else 
-						cout << i->getFilename() << "     "<<i->computeSize()<< "byte" << '\n';
-				}
-
-			}
-			else {
-				cout << "目标目录不存在\n";
-			}
+			folder = ConsoleApp::getInstance()->getFolderByPath(out);
 		}
-
-
 	}
 	else {
-		auto folder = ConsoleApp::getInstance()->getFolderByPath(out);
-		if (folder) {
-			folder->show();
+		folder = ConsoleApp::getInstance()->getFolderByPath(out);
+	}
+
+	if (folder) {
+		std::vector<MiniFile*>files;
+		string output;
+		folder->findMatchFiles(filename, files);
+		cout << "文件数：" << files.size() << '\n';
+
+		std::sort(files.begin(), files.end(), [](MiniFile* a, MiniFile* b)->bool {
+			
+			if (a->isFolder()) {
+				if (!b->isFolder())
+					return 0;
+			}
+			else if (b->isFolder())
+				return 1;
+			return a->getFilename() > b->getFilename();
+		});
+
+		for (auto i : files) {
+			if (i->isFolder()) {
+				if (i->getFilename().length() < 20) {
+					printf("%- 20s", i->getFilename().c_str());
+					
+				}
+				else if(i->getFilename().length() < 40){
+					printf("%- 40s", i->getFilename().c_str());
+				}
+				else {
+					printf("%s  ", i->getFilename().c_str());
+				}
+				printf("文件夹\n");
+			}
+			else {
+				if (i->getFilename().length() < 20) {
+					printf("%- 20s", i->getFilename().c_str());
+				}
+				else if (i->getFilename().length() < 40) {
+					printf("%- 40s", i->getFilename().c_str());
+				}
+				else {
+					printf("%s  ", i->getFilename().c_str());
+				}
+
+				int size = i->computeSize();
+				if (size > (1 << 20)) {
+					printf("大小：%.2lf MB\n",size / 1024.0 / 1024.0);
+				}
+				else if (size > 1024) {
+					printf("大小：%.2lf KB\n",size / 1024.0);
+				}
+				else {
+					printf("大小：%d B\n",size);
+				}
+			}
+		
 		}
-		else {
-			cout << "目标目录不存在\n";
-		}
+	}
+	else {
+		cout << "目标目录不存在\n";
 	}
 }

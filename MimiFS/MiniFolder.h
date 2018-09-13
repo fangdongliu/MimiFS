@@ -37,7 +37,7 @@ public:
 public:
 	//自身操作
 
-	void showAtt()		override;	//显示文件属性(创建日期，大小)
+	const MiniFileHead& getFileHead()override;	//获取文件属性(创建日期，大小)
 	int deleteForever()	override;	//删除文件
 	int computeSize()	override;	//计算文件大小
 	std::string getAbsolutePath();	//获取文件夹绝对路径

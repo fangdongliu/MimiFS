@@ -23,7 +23,8 @@ struct SuperHead {
 	int blockSize;
 	int firstEmptyBlockId;
 	int emptyBlockCount;
-	int maxReachBlock;
+	int arrayCount;
+	int lastEmptyBlockId;
 };
 
 class MiniFolder;
@@ -63,7 +64,7 @@ protected:
 		void seekBlock(int blockId);
 		void reseekCurBlock();
 
-		void getEmptyBlockIds(std::vector<std::pair<int,int>>&,int maxCount);
+		void getEmptyBlockIds(std::vector<BlockHead>&);
 
 		int getBlockSize() { return superHead.blockSize; }
 
@@ -175,14 +176,14 @@ public:
 	//计算文件大小
 	virtual int computeSize() { return fileHead.size; }
 
-	//显示文件属性(创建日期，大小)
-	virtual void showAtt();
+	//获取文件属性(创建日期，大小)
+	virtual const MiniFileHead& getFileHead();
 
 	//永久删除外存中的文件
 	virtual int deleteForever();
 
-	//显示文件占用块号
-	void showMap(std::vector<int>&);
+	//获取文件占用块号
+	void getMap(std::vector<BlockHead>&);
 
 	//计算文件头大小
 	int computeHeadSize()const { return 18 + fileHead.filename.length(); }

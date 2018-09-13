@@ -140,12 +140,59 @@ void ConsoleApp::optFS(Lexer&param) {
 
 	param >= Lexer::end;
 
-	vector<int>emptys;
+	vector<BlockHead>emptys;
 
-	//MiniFile::op.getEmptyBlockIds(emptys, 1000);
+	MiniFile::op.getEmptyBlockIds(emptys);
 
+	if (int n = emptys.size()) {
+		std::sort(emptys.begin(), emptys.end(), [](BlockHead&a, BlockHead&b)->bool {
+			return a.nextBlockId < b.nextBlockId;
+		});
 
+		BlockHead* blocks = new BlockHead[n];
+		auto iter = emptys.begin();
+		blocks[0] = *iter;
+		int cur = 0;
+		while (++iter != emptys.end()) {
 
+			if (blocks[cur].nextBlockId + blocks[cur].arraySize == iter->nextBlockId) {
+				blocks[cur].arraySize += iter->arraySize;
+			}
+			else {
+				blocks[++cur] = *iter;
+			}
+
+		}
+
+		sort(blocks, blocks + cur + 1, [](BlockHead&a, BlockHead&b)->bool {
+			if (a.arraySize == 1) {
+				if (b.arraySize != 1) {
+					return false;
+				}
+			}
+			else if (b.arraySize == 1) {
+				return true;
+			}
+			return a.nextBlockId < b.nextBlockId;
+		});
+
+		auto & op = MiniFile::op;
+
+		op.superHead.firstEmptyBlockId = blocks[0].nextBlockId;
+		op.superHead.lastEmptyBlockId = blocks[cur].nextBlockId;
+
+		for (int i = 0; i < cur; i++) {			
+			op.seekBlock(blocks[i].nextBlockId);
+			blocks[i].nextBlockId = blocks[i + 1].nextBlockId;
+			op.write(blocks[i]);
+		}
+
+		op.seekBlock(blocks[cur].nextBlockId);
+		blocks[cur].nextBlockId = 0;
+		op.write(blocks[cur]);
+
+		delete[]blocks;
+	}
 }
 
 
@@ -157,6 +204,21 @@ void ConsoleApp::showFSInfo(Lexer&param) {
 	cout << "空闲块个数" << MiniFile::op.superHead.emptyBlockCount << '\n';
 	cout << "空闲块头部Id:" << MiniFile::op.superHead.firstEmptyBlockId << "(0/1/2则出错)" << '\n';
 
+	vector<BlockHead>emptys;
+
+	MiniFile::op.getEmptyBlockIds(emptys);
+
+	for (auto i : emptys) {
+
+		if (i.arraySize == 1) {
+			printf("%d ", i.nextBlockId);
+		}
+		else {
+			printf("(%d-%d) ", i.nextBlockId, i.nextBlockId - 1 + i.arraySize);
+		}
+
+	}
+	printf("\n");
 }
 
 void ConsoleApp::showHelp(Lexer& param) {
@@ -210,9 +272,10 @@ void ConsoleApp::closeMiniFS(Lexer&param) {
 void ConsoleApp::formatMiniFS(Lexer& param) {
 
 	SuperHead head;
-	head.maxReachBlock = 3;
+	head.lastEmptyBlockId = 0;
 	head.fileSize = 1 << 30;
 	head.blockSize = 1 << 12;
+	head.arrayCount = 1;
 
 	param > head.fileSize > head.blockSize >= Lexer::end;
 
@@ -288,7 +351,8 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 
 	std::string filename;
 	SuperHead head;
-	head.maxReachBlock = 3;
+	head.arrayCount = 1;
+	head.lastEmptyBlockId = 0;
 	head.fileSize = 1 << 30;
 	head.blockSize = 1 << 12;
 
@@ -330,7 +394,7 @@ void ConsoleApp::createMiniFS(Lexer& param) {
 		//文件尾部标记
 		writer.seekBlock(head.emptyBlockCount + 3);
 		writer.write<char>(0);
-	//	writer.seekBlock(0);
+		//	writer.seekBlock(0);
 	}
 	std::cout << "miniFS 系统( " + filename + " )创建完成" << '\n';
 }

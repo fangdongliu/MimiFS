@@ -22,7 +22,7 @@ void HandleImport::onHandleCommand(Lexer&param) {
 	cnt2 = 0;
 	string from, to, filename;
 
-	
+
 
 	param >= from >= to >= filename >= Lexer::end;
 
@@ -79,7 +79,7 @@ void HandleImport::onHandleCommand(Lexer&param) {
 
 			fseek(file, 0, SEEK_SET);
 
-			int blockCount = filesize / ConsoleApp::getInstance()->getBlockSize() + 1;
+			int blockCount = filesize / (ConsoleApp::getInstance()->getBlockSize() - sizeof(BlockHead)) + 1;
 
 			auto child = folder->createChildFile(filename, blockCount);
 
@@ -104,15 +104,36 @@ void HandleImport::onHandleCommand(Lexer&param) {
 				}
 			}
 			else {
-				while (1) {
-					int n = writer.queryCurrentMaxWriteSize();
-					int len = fread(importBuf, 1, n, file);
+				int cur = 0;
+				int n = 0;
+				int len = 0;
+				int len2 = 0;
+				while (len2 = fread(importBuf + len, 1, 100000 - len, file)) {
+					cur = 0;
+					while (len2) {
+						if (n == 0)
+							n = writer.queryCurrentMaxWriteSize();
 
-					if (len == 0)
-						break;
+						if (n < len2) {
+							writer.writeToBlock(importBuf + cur, n);
+							cur += n;
+							len -= n;
+						}
+						else if (n == len2) {
+							writer.writeToBlock(importBuf + cur, n);
+							cur = 0;
+							len = 0;
+							n = 0;
+						}
+						else {
+							memcpy(importBuf + cur, importBuf, len2);
+							len = len2;
+						}
+					}
+				}
 
+				if (len) {
 					writer.writeToBlock(importBuf, len);
-
 				}
 			}
 
@@ -161,7 +182,7 @@ void HandleImport::importFile(MiniFolder*f, const std::experimental::filesystem:
 		fseek(file, 0, SEEK_SET);
 
 		string name = winPath.filename().string();
-		int blockCount = filesize / ConsoleApp::getInstance()->getBlockSize() + 1;
+		int blockCount = filesize / (ConsoleApp::getInstance()->getBlockSize() - sizeof(BlockHead)) + 1;
 
 		auto child = f->createChildFile(name, blockCount);
 
@@ -185,23 +206,45 @@ void HandleImport::importFile(MiniFolder*f, const std::experimental::filesystem:
 				}
 			}
 		}
-		else{
-			while (1) {
-				int n = writer.queryCurrentMaxWriteSize();
-				int len = fread(importBuf, 1, n, file);
+		else {
 
-				if (len == 0)
-					break;
+			int cur = 0;
+			int n = 0;
+			int len = 0;
+			int len2 = 0;
+			while (len2 = fread(importBuf + len, 1, 100000 - len, file)) {
+				cur = 0;
+				while (len2) {
+					if (n == 0)
+						n = writer.queryCurrentMaxWriteSize();
 
+					if (n < len2) {
+						writer.writeToBlock(importBuf + cur, n);
+						cur += n;
+						len -= n;
+					}
+					else if (n == len2) {
+						writer.writeToBlock(importBuf + cur, n);
+						cur = 0;
+						len = 0;
+						n = 0;
+					}
+					else {
+						memcpy(importBuf + cur, importBuf, len2);
+						len = len2;
+					}
+				}
+			}
+
+			if (len) {
 				writer.writeToBlock(importBuf, len);
-
 			}
 		}
 
-		
+
 		fclose(file);
 		cnt2++;
-		
+
 	}
 
 }
