@@ -123,6 +123,7 @@ void MiniFolder::updateDir() {
 
 	int remainSize = 0;
 
+
 	BlockHead blockHead;
 
 	op.seekBlock(fileHead.blockId);
@@ -130,6 +131,7 @@ void MiniFolder::updateDir() {
 	op.flush();
 	blockHead.size = 0;
 	remainSize = op.getBlockSize()*blockHead.arraySize - sizeof(BlockHead);
+	int cur = fileHead.blockId;
 
 	for (auto& i : childs) {
 
@@ -143,10 +145,10 @@ void MiniFolder::updateDir() {
 			if (!blockHead.nextBlockId)
 				blockHead.nextBlockId = op.requestEmptyBlock(1);
 
-			op.reseekCurBlock();
+			op.seekBlock(cur);
 			op.write(blockHead);
 
-			op.seekBlock(blockHead.nextBlockId);
+			op.seekBlock(cur = blockHead.nextBlockId);
 			op.read(blockHead);
 			op.flush();
 
