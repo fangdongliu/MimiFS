@@ -104,6 +104,7 @@ void HandleImport::onHandleCommand(Lexer&param) {
 				}
 			}
 			else {
+
 				int cur = 0;
 				int n = 0;
 				int len = 0;
@@ -117,17 +118,19 @@ void HandleImport::onHandleCommand(Lexer&param) {
 						if (n < len2) {
 							writer.writeToBlock(importBuf + cur, n);
 							cur += n;
-							len -= n;
+							len2 -= n;
+							n = 0;
 						}
 						else if (n == len2) {
 							writer.writeToBlock(importBuf + cur, n);
 							cur = 0;
-							len = 0;
+							len2 = 0;
 							n = 0;
 						}
 						else {
 							memcpy(importBuf + cur, importBuf, len2);
 							len = len2;
+							len2 = 0;
 						}
 					}
 				}
@@ -136,6 +139,7 @@ void HandleImport::onHandleCommand(Lexer&param) {
 					writer.writeToBlock(importBuf, len);
 				}
 			}
+
 
 			fclose(file);
 			folder->updateDir();
@@ -221,17 +225,19 @@ void HandleImport::importFile(MiniFolder*f, const std::experimental::filesystem:
 					if (n < len2) {
 						writer.writeToBlock(importBuf + cur, n);
 						cur += n;
-						len -= n;
+						len2 -= n;
+						n = 0;
 					}
 					else if (n == len2) {
 						writer.writeToBlock(importBuf + cur, n);
 						cur = 0;
-						len = 0;
+						len2 = 0;
 						n = 0;
 					}
 					else {
 						memcpy(importBuf + cur, importBuf, len2);
 						len = len2;
+						len2 = 0;
 					}
 				}
 			}
