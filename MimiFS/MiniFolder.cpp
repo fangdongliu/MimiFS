@@ -106,7 +106,7 @@ MiniFolder* MiniFolder::createChildFolder(std::string& filename) {
 	auto f = new MiniFolder();
 	f->setParent(this);
 	childs[filename] = f;
-	f->loaded = true;
+	f->loaded = false;
 	f->fileHead.filename = filename;
 	f->fileHead.blockId = op.requestEmptyBlock(1);
 	return f;
