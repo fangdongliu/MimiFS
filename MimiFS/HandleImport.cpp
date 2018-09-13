@@ -65,7 +65,7 @@ void HandleImport::onHandleCommand(Lexer&param) {
 	if (importBuf)
 		delete[]importBuf;
 
-	importBuf = new char[100000];
+	importBuf = new char[200000];
 
 	if (is_directory(w)) {
 		cnt1++;
@@ -85,7 +85,7 @@ void HandleImport::onHandleCommand(Lexer&param) {
 
 			MiniFileWriter writer(child);
 
-			if (filesize < 100000) {
+			if (filesize < 200000) {
 				fread(importBuf, 1, filesize, file);
 				int cur = 0;
 
@@ -109,7 +109,7 @@ void HandleImport::onHandleCommand(Lexer&param) {
 				int n = 0;
 				int len = 0;
 				int len2 = 0;
-				while (len2 = fread(importBuf + len, 1, 100000 - len, file)) {
+				while (len2 = fread(importBuf + len, 1, 200000 - len, file)) {
 					cur = 0;
 					while (len2) {
 						if (n == 0)
@@ -192,7 +192,7 @@ void HandleImport::importFile(MiniFolder*f, const std::experimental::filesystem:
 
 		MiniFileWriter writer(child);
 
-		if (filesize < 100000) {
+		if (filesize < 200000) {
 			fread(importBuf, 1, filesize, file);
 			int cur = 0;
 
@@ -216,7 +216,7 @@ void HandleImport::importFile(MiniFolder*f, const std::experimental::filesystem:
 			int n = 0;
 			int len = 0;
 			int len2 = 0;
-			while (len2 = fread(importBuf + len, 1, 100000 - len, file)) {
+			while (len2 = fread(importBuf + len, 1, 200000 - len, file)) {
 				cur = 0;
 				while (len2) {
 					if (n == 0)

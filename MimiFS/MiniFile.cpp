@@ -118,7 +118,7 @@ void MiniFile::FileOperator::close() {
 
 int MiniFile::FileOperator::requestEmptyBlock(int count) {
 
-	if (superHead.emptyBlockCount > count) {
+	if (superHead.emptyBlockCount >= count) {
 		superHead.emptyBlockCount-=count;
 
 		int ans = superHead.firstEmptyBlockId;
