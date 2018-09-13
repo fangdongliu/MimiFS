@@ -186,7 +186,7 @@ public:
 	void getMap(std::vector<BlockHead>&);
 
 	//计算文件头大小
-	int computeHeadSize()const { return 18 + fileHead.filename.length(); }
+	int computeHeadSize()const { return 22 + fileHead.filename.length(); }
 
 	//判断是否为文件夹
 	bool isFolder()const { return fileHead.type == FS_FILETYPE_FOLDER; }

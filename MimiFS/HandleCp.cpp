@@ -105,10 +105,6 @@ void HandleCp::doCopy(MiniFile*from,MiniFolder*dest) {
 	else {
 		cnt1++;
 
-	
-
-		
-
 		MiniFileReader reader(from);
 
 		int size = from->computeSize();

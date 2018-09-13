@@ -12,6 +12,11 @@ class InvalidFilename :public std::exception {
 
 };
 
+class FilenameLengthTooLong :public std::exception {
+
+
+};
+
 class CommandHandler
 {
 public:

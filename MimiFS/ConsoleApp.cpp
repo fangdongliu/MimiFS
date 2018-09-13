@@ -82,6 +82,9 @@ void ConsoleApp::handleCommand(Lexer&lexer) {
 	catch (const InvalidFilename&e) {
 		cout << "不合法的文件名\n";
 	}
+	catch (const FilenameLengthTooLong&e) {
+		cout << "文件名过长\n";
+	}
 	catch (const std::exception& e) {
 		cout << e.what() << '\n';
 	}
@@ -413,7 +416,12 @@ MiniFile* ConsoleApp::getFileByPath(std::vector<std::string>&pathList) {
 			return folder->parent;
 		}
 		else {
-			return folder->atChild(filename);
+			try {
+				return folder->atChild(filename);
+			}
+			catch(exception&e){
+				throw exception("文件不存在");
+			}
 		}
 	}
 	else {

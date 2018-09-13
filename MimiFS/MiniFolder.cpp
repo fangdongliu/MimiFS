@@ -89,6 +89,11 @@ std::string MiniFolder::getAbsolutePath() {
 }
 
 MiniFile* MiniFolder::createChildFile(std::string& filename,int blockCount) {
+
+	if (filename.length() > 256) {
+		throw FilenameLengthTooLong();
+	}
+
 	auto f = new MiniFile();
 	f->setParent(this);
 	childs[filename] = f;
@@ -269,7 +274,7 @@ bool MiniFolder::moveFrom(MiniFolder*other, std::string&filename) {
 			string str;
 			getline(cin, str);
 			if (!(str.length() == 1 && str[0] == 'y' || str[0] == 'Y')) {
-				return false;
+				throw exception("移动失败");
 			}
 			else {
 				to->deleteForever();
@@ -284,6 +289,6 @@ bool MiniFolder::moveFrom(MiniFolder*other, std::string&filename) {
 		}
 	}
 	catch (exception&e) {
-		return false;
+		throw exception("未找到目标文件");
 	}
 }
